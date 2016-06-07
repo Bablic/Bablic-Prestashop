@@ -103,7 +103,7 @@ class Bablic extends Module
 	private function _displayForm()
 	{
 		$this->_html .= '
-		<form action="'.$_SERVER['REQUEST_URI'].'" method="post">
+		<form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post">
 			<fieldset>
 				<legend><img src="../img/admin/cog.gif" alt="" class="middle" />'.$this->l('Settings').'</legend>
 				<label>'.$this->l('Activate Bablic ON/OFF').'</label>
@@ -111,20 +111,18 @@ class Bablic extends Module
 					<input type="checkbox" name="activate_bablic" value="'.(Tools::getValue('activate_bablic', Configuration::get('activate_bablic')) ? "true" : "false").'"' .
 					(Tools::getValue('activate_bablic', Configuration::get('activate_bablic')) == "true" ? ' checked="checked"' : '') . ' />
 				</div>
-				<label class="clear">'.$this->l('Hello,').'</label> '.Tools::getValue('PS_SHOP_EMAIL', Configuration::get('PS_SHOP_EMAIL')).' !<br>
-				<label class="clear" style="width: 300px;text-align: left;">'.$this->l('To activate bablic please paste the Bablic Snippet in the box below, then press "Save"').'</label>
-				<div class="margin-form clear" style="padding:0 0 1em 0;">
+				<div class="margin-form clear" style="padding:0 0 1em 0;" style="display:none;">
 					<textarea rows="6" cols="80" name="bablic_script"  >'.Tools::getValue('bablic_script', Configuration::get('bablic_script'),true).'</textarea>
 				</div>
 				
-			<input type="submit" name="submit" value="'.$this->l('Save').'" class="button" />
 			</fieldset>
 		</form>';
 	}
 	public function hookdisplayHeader($params){
 		if(Configuration::get('activate_bablic') == 'true')
 		{
-			return htmlspecialchars_decode(Configuration::get('bablic_script'));
+			$json = json_decode(Configuration::get('bablic_script'), true);
+			return htmlspecialchars_decode('<script type="text/javascript" src="'.$json['snippet_url'].'"></script>');
 		}
 		else
 		{
@@ -133,7 +131,7 @@ class Bablic extends Module
 	}	
 	public function hookDisplayBackOfficeHeader()
 	{
-		 $this->context->controller->addJS('https://cdn2.bablic.com/addons/prestashop.js');
+		 $this->context->controller->addJS('http://cdn2.bablic.com/addons/prestashop.js');
 		  $this->context->controller->addCSS('https://cdn2.bablic.com/addons/prestashop.css');
 		
 	
