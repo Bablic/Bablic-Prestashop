@@ -79,8 +79,7 @@ class Bablic extends Module
 	public function getContent()
 	{
 		$this->_html .= '<h2>'.$this->displayName.'</h2>';
-		
-		if (Tools::isSubmit('submit'))
+		if (Tools::getValue('check') == 'yes')
 		{			
 			$this->_postValidation();
 			
@@ -103,8 +102,9 @@ class Bablic extends Module
 	private function _displayForm()
 	{
 		$this->_html .= '
-		<form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post">
+		<form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data">
 			<fieldset>
+				<input type="hidden" name="check" value="yes" />
 				<legend><img src="../img/admin/cog.gif" alt="" class="middle" />'.$this->l('Settings').'</legend>
 				<label>'.$this->l('Activate Bablic ON/OFF').'</label>
 				<div class="margin-form">
@@ -115,7 +115,8 @@ class Bablic extends Module
 					<textarea rows="6" cols="80" name="bablic_script"  >'.Tools::getValue('bablic_script', Configuration::get('bablic_script'),true).'</textarea>
 				</div>
 				
-			</fieldset>
+			</fieldset>			
+			<button type="submit" class="button">Save</button>
 		</form>';
 	}
 	public function hookdisplayHeader($params){
