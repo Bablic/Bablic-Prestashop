@@ -8,7 +8,8 @@ class Bablic extends Module
 	
 	function __construct()
 	{
-		$version_mask = explode('.', _PS_VERSION_, 3);
+		
+/*		$version_mask = explode('.', _PS_VERSION_, 3);
 		$version_test = $version_mask[0] > 0 && $version_mask[1] > 3;
 
 		$this->name = 'Bablic';
@@ -20,6 +21,7 @@ class Bablic extends Module
 
 		$this->displayName = $this->l('Bablic Localization');
 		$this->description = $this->l('Use this code as the basis for your own modules');
+		*/
 	}
 
 	public function install()
