@@ -1,20 +1,32 @@
 <?php
+ /**
+  * Bablic Localization
+  *
+  * LICENSE: This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * @category  localization
+  * @package   bablic
+  * @author    Ishai Jaffe <ishai@bablic.com>
+  * @copyright Bablic 2016
+  * @license   http://www.gnu.org/licenses/ GNU License
+  */
 
-
-  
 class Bablic extends Module
 {
 	private $_html = '';
 	private $_postErrors = array();
 	
-	function __construct()
+	public function __construct()
 	{
 		
-/*		$version_mask = explode('.', _PS_VERSION_, 3);
+		$version_mask = explode('.', _PS_VERSION_, 3);
 		$version_test = $version_mask[0] > 0 && $version_mask[1] > 3;
 
-		$this->name = 'Bablic';
-		$this->tab = $version_test ? 'front_office_features' : 'Tools';
+		$this->name = 'bablic';
+		$this->tab = 'front_office_features';//$version_test ? 'front_office_features' : 'Tools';
 		if ($version_test)
 			$this->author = '';
 		$this->version = '0.2.1';
@@ -22,7 +34,7 @@ class Bablic extends Module
 
 		$this->displayName = $this->l('Bablic Localization');
 		$this->description = $this->l('Use this code as the basis for your own modules');
-		*/
+
 	}
 
 	public function install()
@@ -32,10 +44,11 @@ class Bablic extends Module
 		if (!$this->registerHook('displayHeader'))
 			return false;
 		if (!$this->registerHook('displayBackOfficeHeader'))
-		return false;	
+		    return false;
 		// Set some defaults
 		Configuration::updateValue('activate_bablic', 'true');
 		Configuration::updateValue('bablic_script', 'Paste Snippet here');
+		return true;
 	}
 
 	private function _postValidation()
@@ -100,7 +113,7 @@ class Bablic extends Module
 	public function hookdisplayHeader($params){
 		if(Configuration::get('activate_bablic') == 'true')
 		{
-			$json = json_decode(Configuration::get('bablic_script'), true);
+			$json = Tools::jsonDecode(Configuration::get('bablic_script'), true);
 			return htmlspecialchars_decode('<script type="text/javascript" src="'.$json['snippet_url'].'"></script>');
 		}
 		else
