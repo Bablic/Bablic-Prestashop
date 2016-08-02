@@ -1,14 +1,12 @@
 <?php
 /*
 	Module Name: Bablic
-	Module URI: http://www.ecartservice.net/03082009/writing-your-own-prestashop-module-part-5/
-	Description: A template to use as the basis for writing Prestashop modules
+	Module URI: https://www.bablic.com/
+	Description: Connects your Prestashop to every language instantly
 	Version: 0.1.0
-	Author: Paul Campbell
-	Author URI: http://www.ecartservice.net/
+	Author: Ishai Jaffe
+	Author URI: https://www.bablic.com/
 	
-	Copyright 2009, paul r campbell (pcampbell@ecartservice.net)
-
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
