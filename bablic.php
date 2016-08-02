@@ -34,7 +34,7 @@ class Bablic extends Module
 		$version_mask = explode('.', _PS_VERSION_, 3);
 		$version_test = $version_mask[0] > 0 && $version_mask[1] > 3;
 
-		$this->name = 'bablic';
+		$this->name = 'Bablic';
 		$this->tab = $version_test ? 'front_office_features' : 'Tools';
 		if ($version_test)
 			$this->author = '';
