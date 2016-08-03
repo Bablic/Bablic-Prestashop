@@ -27,14 +27,15 @@ class Bablic extends Module
 
 		$this->name = 'bablic';
 		$this->tab = 'front_office_features';//$version_test ? 'front_office_features' : 'Tools';
-		if ($version_test)
-			$this->author = '';
+        $this->author = 'Ishai Jaffe';
 		$this->version = '0.2.1';
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->bootstrap = true;
+		$this->module_key = '85b91d2e4c985df4f58cdc3beeaaa87d';
 		parent::__construct();
 
 		$this->displayName = $this->l('Bablic Localization');
-		$this->description = $this->l('Use this code as the basis for your own modules');
-
+		$this->description = $this->l('Connects your Prestashop to every language instantly');
 	}
 
 	public function install()
