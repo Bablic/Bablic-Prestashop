@@ -22,7 +22,20 @@ class Bablic_Prestashop_store {
         Configuration::updateValue('bablic'.$key,$value,true);
     }
 }
+/**
 
+DONE:
+- bring SDK to this reposotory
+- put snippet correctly
+
+TODO:
+- prestashop js
+- prestashop css
+
+- admin - http://104.199.31.30/prestashop/admin132xc2qav/
+- user is test@bablic.com
+- password is bablic123
+**/
 
 require_once("sdk.php");
 
@@ -48,7 +61,6 @@ class Bablic extends Module {
 
           $this->displayName = $this->l('Bablic Localization');
           $this->description = $this->l('Connects your Prestashop to every language instantly');
-	  $this->confirmUninstall = "Please note, Bablic will not delete your account or changes. Please visit Bablic in order to delete your account or cancel your subscription if need be.";
 
           $controller = $_GET['controller'];
           $this->sdk = new BablicSDK(
@@ -106,14 +118,12 @@ class Bablic extends Module {
                     $error = 'There was a problem registering this site, please check that website is online and there is that Bablic snippet was not integrated before.';
                 }
                 else {
-		    Configuration::updateValue('BABLIC_CONFIGURATION_OK', true);
                     $message = 'Website was registered successfully';
                 }
                 break;
             case 'set':
                 $site =$data['site'];
                 $this->sdk->set_site($site);
-		Configuration::updateValue('BABLIC_CONFIGURATION_OK', true);
                 $message = '';
                 break;
 	    case 'update':
@@ -177,27 +187,35 @@ class Bablic extends Module {
 	  if (empty($this->sdk->site_id)) {
 	    $was_installed = Configuration::get('bablic_uninstalled');
 	    if ($was_installed!='')
-	      $this->_html .= '<input type="hidden" id="bablic_washere" name="bablic_washere" value="1" />';
-	      $this->_html .= '<span>Bablic detected an older installation, use select site to restore it or create site to create site</span>';
+	      $this->_html .= '<span>Bablic was installed here</span>';
+	    $this->_html .= $this->create_site_form();
+	    $this->_html .= ' </fieldset> </form>';
             return;
 	  }
 	  $this->_html .= ' </fieldset> </form>';
+          if ($this->sdk->trialStarted == true) {
+	    $this->_html .= "<iframe frameborder='0' style='width: 100%; height:100%;' class='bablic_iframe' src='http://staging.bablic.com/channels/dashboard?site=".$this->sdk->site_id."&access_token=".$this->sdk->access_token."' />";
+	    return;
+	  }
+	  $url = $this->sdk->editor_url();
+	  $url = str_replace('www.','staging.', $url);
+	  $this->_html .= "<input type='button' onClick='open_editor();'a class='bablic_button' value='Open Editor'>";
 	  return;
 	}
 
 	public function hookdisplayHeader($params){
 	  $html = "<!-- start Bablic Head V$this->version -->";
 	  try{
-	      $html .= $this->sdk->alt_tags(false);
+	      $html = $html .$this->sdk->alt_tags(false);
 	  } catch (Exception $e) {
-	      $html .= '<!-- Bablic No Alt Tags -->';
+	      $html = $html. '<!-- Bablic No Alt Tags -->';
 	  }
     	  try{
             if($this->sdk->get_locale() != $this->sdk->get_original()){
-              $snippet = $this->sdk->get_snippet();
-              if($snippet != ''){
-                  $html = $html.$snippet;
-              }
+                $snippet = $this->sdk->get_snippet();
+                if($snippet != ''){
+                    $html = $html.$snippet;
+                }
             }
           } catch (Exception $e) {
             $html = $html . '<!-- Bablic No Head -->';
