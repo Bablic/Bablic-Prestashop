@@ -22,20 +22,7 @@ class Bablic_Prestashop_store {
         Configuration::updateValue('bablic'.$key,$value,true);
     }
 }
-/**
 
-DONE:
-- bring SDK to this reposotory
-- put snippet correctly
-
-TODO:
-- prestashop js
-- prestashop css
-
-- admin - http://104.199.31.30/prestashop/admin132xc2qav/
-- user is test@bablic.com
-- password is bablic123
-**/
 
 require_once("sdk.php");
 
@@ -66,7 +53,8 @@ class Bablic extends Module {
           $this->sdk = new BablicSDK(
             array(
               'channel_id' => 'prestashop',
-              'store' => new Bablic_Prestashop_store()
+              'store' => new Bablic_Prestashop_store(),
+              'use_snippet_url' => true
             )
           );
 
@@ -81,15 +69,11 @@ class Bablic extends Module {
 
 	public function install() {
 	  parent::install();
-	  if (!$this->registerHook('displayHeader'))
+	  if(!$this->registerHook('displayHeader'))
 	    return false;
-	  if (!$this->registerHook('displayFooter'))
-	    return false;
-	  if (!$this->registerHook('displayBackOfficeHeader'))
+	  if(!$this->registerHook('displayBackOfficeHeader'))
 	    return false;
 	  // Set some defaults
-	  Configuration::updateValue('activate_bablic', 'true');
-	  Configuration::updateValue('bablic_script', 'Paste Snippet here');
 	  return true;
 	}
 
@@ -111,7 +95,8 @@ class Bablic extends Module {
           $data = Tools::jsonDecode(Tools::getValue('bablic_data'), true);
           $message = '';
           $error = '';
-          switch($data['action']){
+		  $action = isset($data['action']) ? $data['action'] : '';
+          switch($action){
             case 'create':
                 $this->site_create();
                 if(!$this->sdk->site_id){
@@ -126,19 +111,22 @@ class Bablic extends Module {
                 $this->sdk->set_site($site);
                 $message = '';
                 break;
-	    case 'update':
-		$this->sdk->refresh_site();
-		break;
+            case 'keep':
+                Configuration::updateValue('bablic_uninstalled', '');
+                break;
+            case 'clear':
+                Configuration::updateValue('bablic_uninstalled', '');
+                $this->sdk->remove_site();
+                break;
+    	    case 'update':
+                $this->sdk->refresh_site();
+                break;
             case 'delete':
                 $this->sdk->remove_site();
                 $message = 'Website was deleted from Bablic';
                 break;
-          }
-          $this->sdk->clear_cache();
-		//echo Tools::getValue('bablic_script');exit;
-		//$string = strip_tags(nl2br2( Tools::getValue('bablic_script')));
-		//Configuration::updateValue('activate_bablic', (Tools::getValue('activate_bablic') ? 'true' : 'false'));
-		//Configuration::updateValue('bablic_script', htmlentities(Tools::getValue('bablic_script')),true); // html in here gets tricky ;)
+        }
+      $this->sdk->clear_cache();
 
 	  if($error != '')
 	    $this->_html .= '<div class="alert error">'.$error.'</div>';
@@ -159,92 +147,49 @@ class Bablic extends Module {
 				}
 			}
 		}
-		
+        $this->sdk->refresh_site();
+
 		$this->_displayForm();
 		$this->_html .= '</div>';
 		return $this->_html;
 	}
 	
-	private function create_site_form(){
-	  return '
-		<div style="padding: 10px">
-		<input type="button" class="bablic_button" onClick="create_site();" value="Create Site">
-		<input type="button" class="bablic_button" onClick="select_site();" value="I already have a site">
-		</div>';
-	}
 
 	private function _displayForm() {
 	  $this->_html .= '
-	    <form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data">
-	      <fieldset>
-		<input type="hidden" name="check" value="yes" />
-		<input type="hidden" id="bablic_raw_data" value=\''. $this->sdk->get_meta() . '\' />
-		<input type="hidden" id="bablic_siteid" value="'. $this->sdk->site_id . '" />
-		<input type="hidden" id="bablic_trial" value="'.$this->sdk->trialStarted.'" />
-		<input type="hidden" id="bablic_editor" value="'.$this->sdk->editor_url().'" />
-		<input type="hidden" id="bablic_token" value="'.$this->sdk->access_token.'" />
-		<input type="hidden" id="bablic_data" name="bablic_data" value="{}" />';
-	  if (empty($this->sdk->site_id)) {
+            <form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data">
+              <fieldset>
+            <input type="hidden" name="check" value="yes" />
+            <input type="hidden" id="bablic_raw_data" value=\''. $this->sdk->get_meta() . '\' />
+            <input type="hidden" id="bablic_siteid" value="'. $this->sdk->site_id . '" />
+            <input type="hidden" id="bablic_trial" value="'.$this->sdk->trial_started.'" />
+            <input type="hidden" id="bablic_editor" value="'.$this->sdk->editor_url().'" />
+            <input type="hidden" id="bablic_token" value="'.$this->sdk->access_token.'" />
+            <input type="hidden" id="bablic_data" name="bablic_data" value="{}" />';
+  	  if (empty($this->sdk->site_id)) {
 	    $was_installed = Configuration::get('bablic_uninstalled');
-	    if ($was_installed!='')
-	      $this->_html .= '<span>Bablic was installed here</span>';
-	    $this->_html .= $this->create_site_form();
+      if ($was_installed!='')
+	      $this->_html .= '<input type="hidden" id="bablic_uninstalled"></span>';
 	    $this->_html .= ' </fieldset> </form>';
             return;
 	  }
 	  $this->_html .= ' </fieldset> </form>';
-          if ($this->sdk->trialStarted == true) {
-	    $this->_html .= "<iframe frameborder='0' style='width: 100%; height:100%;' class='bablic_iframe' src='http://staging.bablic.com/channels/dashboard?site=".$this->sdk->site_id."&access_token=".$this->sdk->access_token."' />";
-	    return;
-	  }
-	  $url = $this->sdk->editor_url();
-	  $url = str_replace('www.','staging.', $url);
-	  $this->_html .= "<input type='button' onClick='open_editor();'a class='bablic_button' value='Open Editor'>";
-	  return;
 	}
 
 	public function hookdisplayHeader($params){
-	  $html = "<!-- start Bablic Head V$this->version -->";
-	  try{
-	      $html = $html .$this->sdk->alt_tags(false);
-	  } catch (Exception $e) {
-	      $html = $html. '<!-- Bablic No Alt Tags -->';
-	  }
-    	  try{
-            if($this->sdk->get_locale() != $this->sdk->get_original()){
-                $snippet = $this->sdk->get_snippet();
-                if($snippet != ''){
-                    $html = $html.$snippet;
-                }
-            }
-          } catch (Exception $e) {
-            $html = $html . '<!-- Bablic No Head -->';
-          }
-          $html = $html . '<!-- end Bablic Head -->';
-          return htmlspecialchars_decode($html);
-	}
-
-	public function hookdisplayFooter($params){
-          $html = '';
-          try{
-            if($this->sdk->get_locale() == $this->sdk->get_original()){
-                $html = '<!-- start Bablic Footer -->';
-                $snippet = $this->sdk->get_snippet();
-                if($snippet != ''){
-                    $html = $html.$snippet;
-                }
-                $html = $html. '<!-- end Bablic Footer -->';
-            }
-          } catch (Exception $e) {
-            $html = $html . '<!-- Bablic No Footer -->'; 
-          }
-          return htmlspecialchars_decode($html);
+		$header = $this->sdk->get_bablic_top();
+		$footer = $this->sdk->get_bablic_bottom();
+		$footer = preg_replace('/<script /i', '<script async ', $footer);
+		$html = '<!-- Bablic V' . $this->version . ' -->' . $header . $footer;
+        return htmlspecialchars_decode($html);
 	}
 
 	public function hookDisplayBackOfficeHeader()
 	{
-		 $this->context->controller->addJS('http://cdn2.bablic.com/addons/prestashop.js');
-		  $this->context->controller->addCSS('https://cdn2.bablic.com/addons/prestashop.css');
+//	  	 $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
+//	  	 $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
+	  	 $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
+     	  $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
 		
 	
 	}
