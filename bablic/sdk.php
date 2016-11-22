@@ -1,4 +1,18 @@
 <?php
+ /**
+  * Bablic Localization
+  *
+  * LICENSE: This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * @category  localization
+  * @package   bablic
+  * @author    Ishai Jaffe <ishai@bablic.com>
+  * @copyright Bablic 2016
+  * @license   http://www.gnu.org/licenses/ GNU License
+  */
 
 class mock_store {
     private $store = array();
@@ -19,7 +33,7 @@ class mock_store {
 class file_store {
     private $store = array();
 
-    function __construct() {
+    public function __construct() {
         $tmp_dir = sys_get_temp_dir();
         $this->filename = "$tmp_dir/bablic_snippet";
         if(file_exists($this->filename)){
@@ -64,7 +78,7 @@ class BablicSDK {
 	private $timestamp = 0;
 	private $use_snippet_url = false;
 
-    function __construct($options) {
+    public function __construct($options) {
         if (empty($options['channel_id'])){
             $options['channel_id'] = 'php';
         }
@@ -468,7 +482,7 @@ class BablicSDK {
             case 'custom':
                 foreach ($custom_urls as &$value) {
                     $pattern = $this->create_domain_regex($value);
-                    if (preg_match($pattern, $url, $matches))
+                    if (preg_match($pattern, $parsed_url['host'], $matches))
                         return $value;
                 }
                 return $default;

@@ -83,7 +83,7 @@ class Bablic extends Module {
 	    $this->_postErrors[] = $this->l('The message you entered was not allowed, sorry');
 	}
 
-	function site_create(){
+	private function site_create(){
           $rslt = $this->sdk->create_site(
             array(
                 'site_url' => Tools::getHttpHost(true).__PS_BASE_URI__
