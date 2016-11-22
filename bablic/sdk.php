@@ -1,29 +1,27 @@
 <?php
 /**
-* Bablic Localization
-*
-* LICENSE: This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* @category  localization
-* @package   bablic
-* @author    Ishai Jaffe <ishai@bablic.com>
-* @copyright Bablic 2016
-* @license   http://www.gnu.org/licenses/ GNU License
-*/
+ * Bablic Localization.
+ *
+ * LICENSE: This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @category  localization
+ *
+ * @author    Ishai Jaffe <ishai@bablic.com>
+ * @copyright Bablic 2016
+ * @license   http://www.gnu.org/licenses/ GNU License
+ */
+
 class MockStore
 {
     private $store = array();
     public function get($key)
     {
-        if (empty($this->store[$key]))
-        {
+        if (empty($this->store[$key])) {
             return '';
-        }
-        else
-        {
+        } else {
             return $this->store[$key];
         }
     }
@@ -39,36 +37,32 @@ class FileStore
     {
         $tmp_dir = sys_get_temp_dir();
         $this->filename = "$tmp_dir/bablic_snippet";
-        if(file_exists($this->filename))
-        {
-            $str =  Tools::file_get_contents($this->filename);
+        if (file_exists($this->filename)) {
+            $str = Tools::file_get_contents($this->filename);
             $this->store = Tools::jsonDecode($str, true);
         }
     }
     public function get($key)
     {
-        if (empty($this->store[$key]))
-        {
+        if (empty($this->store[$key])) {
             return '';
-        }
-        else
-{
+        } else {
             return $this->store[$key];
         }
     }
     public function set($key, $value)
     {
         $this->store[$key] = $value;
-        $file = fopen($this->filename, "w");
-        if($file)
-        {
+        $file = fopen($this->filename, 'w');
+        if ($file) {
             $str = Tools::jsonEncode($this->store);
             fwrite($file, $str);
             fclose($file);
         }
     }
 }
-class BablicSDK {
+class BablicSDK
+{
     public $site_id = '';
     private $save_flag = true;
     private $done = false;
@@ -87,47 +81,39 @@ class BablicSDK {
     private $use_snippet_url = false;
     public function __construct($options)
     {
-        if (empty($options['channel_id']))
-        {
+        if (empty($options['channel_id'])) {
             $options['channel_id'] = 'php';
         }
         $this->channel_id = $options['channel_id'];
-        if(!empty($options['store']))
-        {
+        if (!empty($options['store'])) {
             $this->store = $options['store'];
-        }
-        else
-{
+        } else {
             $this->store = new FileStore();
         }
-        if ($this->store->get('site_id') != '')
-        {
+        if ($this->store->get('site_id') != '') {
             $this->get_data_from_store();
         }
-        if(!empty($options['site_id']))
-        {
+        if (!empty($options['site_id'])) {
             $this->site_id = $options['site_id'];
-            if($this->store->get('site_id') != $this->site_id)
+            if ($this->store->get('site_id') != $this->site_id) {
                 $this->get_site_from_bablic();
+            }
         }
-        if($this->site_id && (empty($this->timestamp) || ((time() - $this->timestamp) > 12000)))
-        {
+        if ($this->site_id && (empty($this->timestamp) || ((time() - $this->timestamp) > 12000))) {
             $this->timestamp = time();
             $this->get_site_from_bablic();
         }
-        if(!empty($options['subdir']) && $this->meta)
-        {
+        if (!empty($options['subdir']) && $this->meta) {
             $meta = Tools::jsonDecode($this->meta, true);
             $locale_keys = $meta['localeKeys'];
-            if(count($locale_keys) > 0)
-            {
+            if (count($locale_keys) > 0) {
                 $this->subdir = $options['subdir'];
-                if(!empty($options['subdir_base']))
+                if (!empty($options['subdir_base'])) {
                     $this->subdir_base = $options['subdir_base'];
+                }
             }
         }
-        if(isset($options['use_snippet_url']))
-        {
+        if (isset($options['use_snippet_url'])) {
             $this->use_snippet_url = true;
         }
     }
@@ -136,10 +122,10 @@ class BablicSDK {
         $this->store->set('meta', $this->meta);
         $this->store->set('access_token', $this->access_token);
         $this->store->set('version', $this->version);
-        $this->store->set('trial_started', $this->trial_started?'1':'');
+        $this->store->set('trial_started', $this->trial_started ? '1' : '');
         $this->store->set('snippet', $this->snippet);
         $this->store->set('site_id', $this->site_id);
-        $this->store->set('time',$this->timestamp);
+        $this->store->set('time', $this->timestamp);
     }
     public function clear_data()
     {
@@ -161,39 +147,35 @@ class BablicSDK {
         $this->access_token = $this->store->get('access_token');
         $this->timestamp = $this->store->get('time');
     }
-    public function set_site($site,$callback='')
+    public function set_site($site, $callback = '')
     {
-        if(empty($site['id']))
-        {
+        if (empty($site['id'])) {
             die('No site id');
         }
         $this->site_id = $site['id'];
-        if($this->access_token == '')
-        {
+        if ($this->access_token == '') {
             $this->access_token = isset($site['access_token']) ? $site['access_token'] : '';
         }
         $this->get_site_from_bablic();
-        if($callback == '')
-        {
+        if ($callback == '') {
             return;
         }
-        $url = "https://www.bablic.com/api/v1/site/".$site['id']."?access_token=$this->access_token&channel_id=$this->channel_id";
+        $url = 'https://www.bablic.com/api/v1/site/'.$site['id']."?access_token=$this->access_token&channel_id=$this->channel_id";
         $payload = array(
-            'callback' => $callback
+            'callback' => $callback,
         );
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json","X-HTTP-Method-Override:PUT","Expect:"));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'X-HTTP-Method-Override:PUT', 'Expect:'));
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, Tools::jsonEncode($payload));
         $result = curl_exec($ch);
         $result = Tools::jsonDecode($result, true);
-        if (!empty($result['error']))
-        {
-            return array("error" => "Bablic returned error");
+        if (!empty($result['error'])) {
+            return array('error' => 'Bablic returned error');
         }
     }
     public function create_site($options)
@@ -201,7 +183,7 @@ class BablicSDK {
         $url = "https://www.bablic.com/api/v1/site?channel_id=$this->channel_id";
         $payload = array(
             'url' => $options['site_url'],
-            'email'=> isset($options['email']) ? $options['email'] : '',
+            'email' => isset($options['email']) ? $options['email'] : '',
             'original' => isset($options['original_locale']) ? $options['original_locale'] : '',
             'callback' => isset($options['callback']) ? $options['callback'] : '',
         );
@@ -210,18 +192,17 @@ class BablicSDK {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json","Expect:"));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'Expect:'));
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, Tools::jsonEncode($payload));
         $result = curl_exec($ch);
         $result = Tools::jsonDecode($result, true);
-        if (!empty($result['error']))
-        {
-            return array("error" => "Bablic returned error");
+        if (!empty($result['error'])) {
+            return array('error' => 'Bablic returned error');
         }
         $this->access_token = $result['access_token'];
         $this->site_id = $result['id'];
-        $this->snippet = $this->use_snippet_url ? '<script type="text/javascript" src="'. $result['snippetURL'] .'"></script>': $result['snippet'];
+        $this->snippet = $this->use_snippet_url ? '<script type="text/javascript" src="'.$result['snippetURL'].'"></script>' : $result['snippet'];
         $this->version = $result['version'];
         $this->trial_started = false;
         $this->meta = Tools::jsonEncode($result['meta']);
@@ -235,22 +216,21 @@ class BablicSDK {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         $result = Tools::jsonDecode($result, true);
-        if (!empty($result['error']))
-        {
-            if(!empty($result['error']['code']) && $result['error']['code'] == 410)
-            {
+        if (!empty($result['error'])) {
+            if (!empty($result['error']['code']) && $result['error']['code'] == 410) {
                 $this->clear_data();
                 $this->save_data_to_store();
-                return array("error" => "Site removed");
+
+                return array('error' => 'Site removed');
             }
-            return array("error" => "Bablic returned error");
+
+            return array('error' => 'Bablic returned error');
         }
-        if(!empty($result['access_token']))
-        {
+        if (!empty($result['access_token'])) {
             $this->access_token = $result['access_token'];
         }
         $this->site_id = $result['id'];
-        $this->snippet = $this->use_snippet_url ? '<script type="text/javascript" src="'. $result['snippetURL'] .'"></script>': $result['snippet'];
+        $this->snippet = $this->use_snippet_url ? '<script type="text/javascript" src="'.$result['snippetURL'].'"></script>' : $result['snippet'];
         $this->version = $result['version'];
         $this->trial_started = $result['trialStarted'];
         $this->meta = Tools::jsonEncode($result['meta']);
@@ -265,8 +245,7 @@ class BablicSDK {
     {
         $tmp_dir = sys_get_temp_dir();
         $folder = "$tmp_dir/bablic_cache";
-        if (!file_exists($folder))
-        {
+        if (!file_exists($folder)) {
             return;
         }
         array_map('unlink', glob("$folder/*"));
@@ -277,50 +256,49 @@ class BablicSDK {
     }
     public function get_site()
     {
-        return array (
-            "meta" => $this->meta,
-            "access_token" => $this->access_token,
-            "site_id" => $this->site_id,
-            "version" => $this->version,
-            "trial_started" => $this->trial_started,
-            "snippet" => $this->snippet
+        return array(
+            'meta' => $this->meta,
+            'access_token' => $this->access_token,
+            'site_id' => $this->site_id,
+            'version' => $this->version,
+            'trial_started' => $this->trial_started,
+            'snippet' => $this->snippet,
         );
     }
     public function get_snippet()
     {
-        if($this->subdir)
-        {
+        if ($this->subdir) {
             $locale = $this->get_locale();
+
             return '<script type="text/javascript">var bablic=bablic||{};bablic.localeURL="subdir";bablic.subDirBase="'.$this->subdir_base.'";bablic.locale="'.$locale.'"</script>'.$this->snippet;
         }
+
         return $this->snippet;
     }
     public function get_bablic_top()
     {
-        return '<!-- start Bablic Head -->'.$this->get_alt_tags().($this->get_locale() != $this->get_original() ? $this->get_snippet() : '') . '<!-- end Bablic Head -->';
+        return '<!-- start Bablic Head -->'.$this->get_alt_tags().($this->get_locale() != $this->get_original() ? $this->get_snippet() : '').'<!-- end Bablic Head -->';
     }
     public function bablic_top()
     {
         echo '<!-- start Bablic Head -->';
         $this->alt_tags();
-        if($this->get_locale() != $this->get_original())
-        {
+        if ($this->get_locale() != $this->get_original()) {
             echo $this->get_snippet();
         }
         echo '<!-- end Bablic Head -->';
     }
     public function get_bablic_bottom()
     {
-        if($this->get_locale() == $this->get_original())
-        {
-            return '<!-- start Bablic Footer -->'. $this->get_snippet() . '<!-- end Bablic Footer -->';
+        if ($this->get_locale() == $this->get_original()) {
+            return '<!-- start Bablic Footer -->'.$this->get_snippet().'<!-- end Bablic Footer -->';
         }
+
         return '';
     }
     public function bablic_bottom()
     {
-        if($this->get_locale() == $this->get_original())
-        {
+        if ($this->get_locale() == $this->get_original()) {
             echo '<!-- start Bablic Footer -->';
             echo $this->get_snippet();
             echo '<!-- end Bablic Footer -->';
@@ -333,20 +311,17 @@ class BablicSDK {
         $locale = $this->get_locale();
         $url = $_SERVER['REQUEST_URI'];
         $str = '';
-        if(is_array($locale_keys))
-        {
-            foreach( $locale_keys as $alt)
-            {
-                if($alt != $locale)
-                {
-                    $str .= '<link rel="alternate" href="' . $this->get_link($alt,$url) . '" hreflang="'.$alt.'">';
+        if (is_array($locale_keys)) {
+            foreach ($locale_keys as $alt) {
+                if ($alt != $locale) {
+                    $str .= '<link rel="alternate" href="'.$this->get_link($alt, $url).'" hreflang="'.$alt.'">';
                 }
             }
-            if($locale != $meta['original'])
-            {
-                $str .= '<link rel="alternate" href="' . $this->get_link($meta['original'],$url) . '" hreflang="'.$meta['original'].'">';
+            if ($locale != $meta['original']) {
+                $str .= '<link rel="alternate" href="'.$this->get_link($meta['original'], $url).'" hreflang="'.$meta['original'].'">';
             }
         }
+
         return $str;
     }
     public function alt_tags()
@@ -355,106 +330,91 @@ class BablicSDK {
         $locale_keys = $meta['localeKeys'];
         $locale = $this->get_locale();
         $url = $_SERVER['REQUEST_URI'];
-        if(is_array($locale_keys))
-        {
-            foreach( $locale_keys as $alt)
-            {
-                if($alt != $locale)
-                {
-                    echo '<link rel="alternate" href="' . $this->get_link($alt,$url) . '" hreflang="'.$alt.'">';
+        if (is_array($locale_keys)) {
+            foreach ($locale_keys as $alt) {
+                if ($alt != $locale) {
+                    echo '<link rel="alternate" href="'.$this->get_link($alt, $url).'" hreflang="'.$alt.'">';
                 }
             }
-            if($locale != $meta['original'])
-            {
-                echo '<link rel="alternate" href="' . $this->get_link($meta['original'],$url) . '" hreflang="'.$meta['original'].'">';
+            if ($locale != $meta['original']) {
+                echo '<link rel="alternate" href="'.$this->get_link($meta['original'], $url).'" hreflang="'.$meta['original'].'">';
             }
         }
     }
     private function get_all_headers()
     {
         $headers = array();
-        foreach($_SERVER as $key => $value)
-        {
-            if (Tools::substr($key, 0, 5) <> 'HTTP_')
-            {
+        foreach ($_SERVER as $key => $value) {
+            if (Tools::substr($key, 0, 5) != 'HTTP_') {
                 continue;
             }
             $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', Tools::strtolower(Tools::substr($key, 5)))));
             $headers[$header] = $value;
         }
+
         return $headers;
     }
     public function detect_locale_from_header()
     {
         $headers = $this->get_all_headers();
-        if(!isset($headers['Accept-Language']))
-        {
+        if (!isset($headers['Accept-Language'])) {
             return false;
         }
         $lang = explode(',', $headers['Accept-Language']);
-        if (!empty($lang))
-        { return $lang[0]; }
+        if (!empty($lang)) {
+            return $lang[0];
+        }
+
         return false;
     }
     public function detect_locale_from_cookie($allowed_keys)
     {
-        if (!empty(Context::getContext()->cookie('bab_locale')) && !empty($allowed_keys))
-        {
+        if (!empty(Context::getContext()->cookie('bab_locale')) && !empty($allowed_keys)) {
             $cookie_locale = Context::getContext()->cookie('bab_locale');
             $match = false;
-            foreach ($allowed_keys as &$value)
-            {
-                if ($value === $cookie_locale)
-                {
+            foreach ($allowed_keys as &$value) {
+                if ($value === $cookie_locale) {
                     $match = true;
                 }
-                if (!$match)
-                {
-                    if (Tools::substr($value,0,2) === Tools::substr($cookie_locale,0,2))
-                    {
+                if (!$match) {
+                    if (Tools::substr($value, 0, 2) === Tools::substr($cookie_locale, 0, 2)) {
                         $match = true;
                     }
                 }
             }
-            if ($match)
-            {
+            if ($match) {
                 return $cookie_locale;
             }
         }
+
         return false;
     }
     public function get_link($locale, $url)
     {
         $parsed = parse_url($url);
-        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] . '://' : '';
+        $scheme = isset($parsed['scheme']) ? $parsed['scheme'].'://' : '';
         $host = isset($parsed['host']) ? $parsed['host'] : '';
-        $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
+        $port = isset($parsed['port']) ? ':'.$parsed['port'] : '';
         $path = isset($parsed['path']) ? $parsed['path'] : '/';
-        $query    = isset($parsed['query']) ? '?' . $parsed['query'] : '';
-        $fragment = isset($parsed['fragment']) ? '#' . $parsed['fragment'] : '';
+        $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
+        $fragment = isset($parsed['fragment']) ? '#'.$parsed['fragment'] : '';
         $meta = Tools::jsonDecode($this->meta, true);
         $link = 'javascript:void(0);';
         $localeDetection = $meta['localeDetection'];
-        if($this->subdir)
-        {
+        if ($this->subdir) {
             $localeDetection = 'subdir';
         }
-        if($localeDetection == 'custom' && empty($meta['customUrls']))
-        {
+        if ($localeDetection == 'custom' && empty($meta['customUrls'])) {
             $localeDetection = 'querystring';
         }
-        switch($localeDetection)
-        {
+        switch ($localeDetection) {
             case 'custom':
             $custom_url = $meta['customUrls'][$locale];
-            if ($custom_url)
-            {
+            if ($custom_url) {
                 $scheme = $scheme == '' ? 'http://' : $scheme;
-                if(strpos($custom_url, '/') !== false)
-                {
+                if (strpos($custom_url, '/') !== false) {
                     // custom contains querystring
-                    if(strpos($custom_url, '?') !== false)
-                    {
+                    if (strpos($custom_url, '?') !== false) {
                         return $scheme.$custom_url.$fragment;
                     }
                     // custom contains path
@@ -466,53 +426,54 @@ class BablicSDK {
             break;
             case 'querystring':
             $query_locale = '';
-            if(!isset($parsed['query']))
-            {
+            if (!isset($parsed['query'])) {
                 return $scheme.$host.$port.$path.'?locale='.$locale.$fragment;
             }
             $output = array();
-            parse_str(Tools::substr($query,1),$output);
+            parse_str(Tools::substr($query, 1), $output);
             $output['locale'] = $locale;
             $query = http_build_query($output);
+
             return $scheme.$host.$port.$path.'?'.$query.$fragment;
             case 'subdir':
             $locale_keys = $meta['localeKeys'];
-            $locale_regex = "(" . implode("|",$locale_keys) . ")";
-            $path = preg_replace('/^(?:'.preg_quote($this->subdir_base,'/').')?\/'.$locale_regex.'\//','/',$path);
-            $prefix = $locale == $meta['original'] ? '' : '/' . $locale;
+            $locale_regex = '('.implode('|', $locale_keys).')';
+            $path = preg_replace('/^(?:'.preg_quote($this->subdir_base, '/').')?\/'.$locale_regex.'\//', '/', $path);
+            $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
+
             return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':
             $fragment = '#locale_'.$locale;
+
             return $scheme.$host.$port.$path.$query.$fragment;
         }
+
         return $url;
     }
     public function get_original()
     {
-        if($this->meta == '')
-        {
+        if ($this->meta == '') {
             return null;
         }
         $meta = Tools::jsonDecode($this->meta, true);
+
         return $meta['original'];
     }
     public function get_locales()
     {
-        if($this->meta == '')
-        {
+        if ($this->meta == '') {
             return array();
         }
         $meta = Tools::jsonDecode($this->meta, true);
+
         return $meta['localeKeys'];
     }
     public function get_locale()
     {
-        if(!empty($_SERVER['HTTP_BABLIC_LOCALE']))
-        {
+        if (!empty($_SERVER['HTTP_BABLIC_LOCALE'])) {
             return $_SERVER['HTTP_BABLIC_LOCALE'];
         }
-        if($this->meta == '')
-        {
+        if ($this->meta == '') {
             return '';
         }
         $meta = Tools::jsonDecode($this->meta, true);
@@ -521,24 +482,19 @@ class BablicSDK {
         $custom_urls = $meta['customUrls'];
         $locale_keys = $meta['localeKeys'];
         $locale_detection = $meta['localeDetection'];
-        if($this->subdir)
-        {
+        if ($this->subdir) {
             $locale_detection = 'subdir';
         }
         $detected = '';
-        if($auto && !empty($locale_keys))
-        {
+        if ($auto && !empty($locale_keys)) {
             $detected_lang = $this->detect_locale_from_header();
-            $normalized_lang = Tools::strtolower(str_replace('-','_',$detected_lang));
-            foreach ($locale_keys as &$value)
-            {
-                if ($value === $normalized_lang)
-                {
+            $normalized_lang = Tools::strtolower(str_replace('-', '_', $detected_lang));
+            foreach ($locale_keys as &$value) {
+                if ($value === $normalized_lang) {
                     $detected = $value;
                     break;
                 }
-                if (Tools::substr($value,0,2) === Tools::substr($normalized_lang,0,2))
-                {
+                if (Tools::substr($value, 0, 2) === Tools::substr($normalized_lang, 0, 2)) {
                     $detected = $value;
                     break;
                 }
@@ -546,58 +502,52 @@ class BablicSDK {
         }
         $from_cookie = $this->detect_locale_from_cookie($locale_keys);
         $parsed_url = parse_url($this->get_current_url());
-        switch ($locale_detection)
-        {
+        switch ($locale_detection) {
             case 'querystring':
-            if (!empty( Tools::getValue('locale')))
-            {
+            if (!empty(Tools::getValue('locale'))) {
                 return Tools::getValue('locale');
-            }
-            else if ($from_cookie)
-            {
+            } elseif ($from_cookie) {
                 return $from_cookie;
-            }
-            else if ($detected)
-            {
+            } elseif ($detected) {
                 return $detected;
             }
+
             return $default;
             case 'subdir':
             $path = $parsed_url['path'];
-            preg_match("/^(?:".preg_quote($this->subdir_base,'/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
-            if ($matches)
-            {
+            preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
+            if ($matches) {
                 return $matches[2];
             }
-            if ($from_cookie)
-            {
+            if ($from_cookie) {
                 return $default;
             }
-            if ($detected)
-            {
+            if ($detected) {
                 return $detected;
             }
+
             return $default;
             case 'custom':
-            foreach ($custom_urls as &$value)
-            {
+            foreach ($custom_urls as &$value) {
                 $pattern = $this->create_domain_regex($value);
-                if (preg_match($pattern, $parsed_url['host'], $matches))
-                {
+                if (preg_match($pattern, $parsed_url['host'], $matches)) {
                     return $value;
                 }
             }
+
             return $default;
             default:
             return $from_cookie;
         }
+
         return;
     }
     private function create_domain_regex($str)
     {
         $new_str = preg_replace("/([.?+^$[\]\\()
-{}|-])/g", "\\$1", $str);
-        return preg_replace("/\*/g",'.*', $new_str);
+{}|-])/g", '\$1', $str);
+
+        return preg_replace("/\*/g", '.*', $new_str);
     }
     public function editor_url()
     {
@@ -608,113 +558,102 @@ class BablicSDK {
         $url = "https://www.bablic.com/api/v1/site/$this->site_id?access_token=$this->access_token&channel_id=$this->channel_id";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $this->clear_data();
         curl_close($ch);
     }
-    public function handle_request($options=array())
+    public function handle_request($options = array())
     {
-        if($this->site_id == '')
-        {
+        if ($this->site_id == '') {
             return;
         }
-        if (($this->is_bot() == false) && (empty($options['debug']) || $options['debug'] == false))
-        {
+        if (($this->is_bot() == false) && (empty($options['debug']) || $options['debug'] == false)) {
             return;
         }
-        if (!empty($options['url']))
-        {
+        if (!empty($options['url'])) {
             $this->url = $options['url'];
-        }
-        else
-{
+        } else {
             $this->url = $this->get_current_url();
         }
-        if (!empty($options['nocache']) && $options['nocache'] == true)
-        {
+        if (!empty($options['nocache']) && $options['nocache'] == true) {
             $this->nocache = true;
         }
-        if($this->meta)
-        {
+        if ($this->meta) {
             $meta = Tools::jsonDecode($this->meta, true);
             $default = $meta['default'];
             $locale = $this->get_locale();
-            if ($default == $locale)
+            if ($default == $locale) {
                 return;
+            }
             $this->get_html_for_url($this->url);
-        }
-        else
-{
+        } else {
             $this->get_html_for_url($this->url);
         }
     }
     private function is_bot()
     {
-        if(empty($_SERVER['HTTP_USER_AGENT']))
-        {
+        if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return false;
         }
-        $is_bot =  '/bot|crawler|baiduspider|facebookexternalhit|Twitterbot|80legs|mediapartners-google|adsbot-google/i';
-        if(preg_match($is_bot, $_SERVER['HTTP_USER_AGENT'], $matches))
-        {
+        $is_bot = '/bot|crawler|baiduspider|facebookexternalhit|Twitterbot|80legs|mediapartners-google|adsbot-google/i';
+        if (preg_match($is_bot, $_SERVER['HTTP_USER_AGENT'], $matches)) {
             return true;
         }
+
         return false;
     }
     private function get_current_url()
     {
         $protocol = 'http';
-        if ($_SERVER['SERVER_PORT'] == 443 || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'))
-        {
+        if ($_SERVER['SERVER_PORT'] == 443 || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')) {
             $protocol .= 's';
         }
         $host = $_SERVER['HTTP_HOST'];
         $uri = $_SERVER['REQUEST_URI'];
+
         return "$protocol://$host$uri";
     }
     public function ignorable($url)
     {
         $filename_tester = "/\.(js|css|jpg|jpeg|png|mp3|avi|mpeg|bmp|wav|pdf|doc|xml|docx|xlsx|xls|json|kml|svg|eot|woff|woff2)/";
+
         return preg_match($filename_tester, $url, $matches);
     }
     public function process_buffer($buffer)
     {
         $headers = headers_list();
         $rcode = 200;
-        if(function_exists('http_response_code'))
-        {
+        if (function_exists('http_response_code')) {
             $rcode = http_response_code();
-        }
-        else
-        {
+        } else {
             $rcode = (isset($GLOBALS['http_response_code']) ? $GLOBALS['http_response_code'] : 200);
         }
-        if ($rcode < 200 || $rcode >= 300) return false;
-        if ($this->ignorable($this->get_current_url())) return false;
-        foreach ($headers as &$value)
-        {
+        if ($rcode < 200 || $rcode >= 300) {
+            return false;
+        }
+        if ($this->ignorable($this->get_current_url())) {
+            return false;
+        }
+        foreach ($headers as &$value) {
             $html_found = 0;
             $contenttype_found = 0;
-            $html_found = strpos($value, "text/html;");
-            $contenttype_found = strpos($value, "Content-Type");
-            if ($html_found === false)
-            {
+            $html_found = strpos($value, 'text/html;');
+            $contenttype_found = strpos($value, 'Content-Type');
+            if ($html_found === false) {
                 // do nothing
-            }
-else
-{
+            } else {
                 break;
             }
         }
-        if (($html_found === false)&&($contenttype_found === 0))
-        {
+        if (($html_found === false) && ($contenttype_found === 0)) {
             return false;
         }
         $html = ob_get_contents();
         $url = $this->url;
         $response = $this->send_to_bablic($url, $html);
+
         return $response;
     }
     private function filename_from_url($url)
@@ -725,14 +664,14 @@ else
     {
         $tmp_dir = sys_get_temp_dir();
         $folder = "$tmp_dir/bablic_cache";
-        if (!file_exists($folder))
-        {
+        if (!file_exists($folder)) {
             mkdir($folder);
         }
         $filename = $this->filename_from_url($url);
+
         return "$folder/$filename";
     }
-    public function write_buffer($ch,$fp,$len)
+    public function write_buffer($ch, $fp, $len)
     {
         $data = Tools::substr($this->_body, $this->pos, $len);
         // increment $pos
@@ -742,31 +681,31 @@ else
     }
     private function send_to_bablic($url, $html)
     {
-        $bablic_url = "http://seo.bablic.com/api/engine/seo?site=$this->site_id&url=".urlencode($url).($this->subdir ? "&ld=subdir" : "").($this->subdir_base ? "&sdb=" .urlencode($this->subdir_base) : "");
+        $bablic_url = "http://seo.bablic.com/api/engine/seo?site=$this->site_id&url=".urlencode($url).($this->subdir ? '&ld=subdir' : '').($this->subdir_base ? '&sdb='.urlencode($this->subdir_base) : '');
         $curl = curl_init($bablic_url);
         $length = Tools::strlen($html);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: text/html", "Content-Length: $length","Expect:"));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: text/html', "Content-Length: $length", 'Expect:'));
         curl_setopt($curl, CURLOPT_POST, true);
         $this->_body = $html;
         $this->pos = 0;
-        curl_setopt($curl, CURLOPT_READFUNCTION, array(&$this,'write_buffer'));
+        curl_setopt($curl, CURLOPT_READFUNCTION, array(&$this, 'write_buffer'));
         $response = curl_exec($curl);
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if (($status != 200 ) && ($status != 301))
-        {
+        if (($status != 200) && ($status != 301)) {
             return $html;
         }
         curl_close($curl);
         $this->save_html($response, $this->full_path_from_url($url));
+
         return $response;
     }
     private function save_html($content, $filename)
     {
-        $file = fopen($filename, "w") or die("Unable to open file!");
+        $file = fopen($filename, 'w') or die('Unable to open file!');
         fwrite($file, $content);
         fclose($file);
     }
@@ -777,35 +716,36 @@ else
     public function get_html_for_url($url)
     {
         $cached_file = $this->read_from_cache($this->full_path_from_url($url));
-        if ($cached_file)
-        {
+        if ($cached_file) {
             exit;
+
             return;
         }
-        ob_start(array(&$this, "process_buffer"));
+        ob_start(array(&$this, 'process_buffer'));
+
         return;
     }
     private function read_from_cache($filename)
     {
-        if ($this->nocache == true) return false;
-        try{
+        if ($this->nocache == true) {
+            return false;
+        }
+        try {
             $html_file = file_exists($filename);
-            if ($html_file)
-            {
+            if ($html_file) {
                 $file_modified = filemtime($filename);
                 $now = round(microtime(true) * 1000);
-                $validity = ($now - (2*24*60*60*1000) > $file_modified);
-                if ($validity === false) return false;
+                $validity = ($now - (2 * 24 * 60 * 60 * 1000) > $file_modified);
+                if ($validity === false) {
+                    return false;
+                }
                 readfile($filename);
+
                 return true;
-            }
-else
-{
+            } else {
                 return false;
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return false;
         }
     }
