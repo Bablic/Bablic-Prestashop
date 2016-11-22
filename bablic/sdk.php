@@ -320,8 +320,8 @@ class BablicSDK
     }
     public function detectLocaleFromCookie($allowed_keys)
     {
-        if (!empty(Context::getContext()->cookie('bab_locale')) && !empty($allowed_keys)) {
-            $cookie_locale = Context::getContext()->cookie('bab_locale');
+        if (!empty($_COOKIE) && !empty($_COOKIE['bab_locale']) && !empty($allowed_keys)) {
+            $cookie_locale = Context::getContext()->cookie->bab_locale;
             $match = false;
             foreach ($allowed_keys as &$value) {
                 if ($value === $cookie_locale) {
