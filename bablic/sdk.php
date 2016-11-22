@@ -201,7 +201,7 @@ class BablicSDK
         }
         array_map('unlink', glob("$folder/*"));
     }
-    public function get_meta()
+    public function getMeta()
     {
         return $this->meta;
     }
@@ -305,7 +305,7 @@ class BablicSDK
 
         return $headers;
     }
-    public function detect_locale_from_header()
+    public function detectLocaleFromHeader()
     {
         $headers = $this->getAllHeaders();
         if (!isset($headers['Accept-Language'])) {
@@ -360,43 +360,41 @@ class BablicSDK
         }
         switch ($localeDetection) {
             case 'custom':
-            $custom_url = $meta['customUrls'][$locale];
-            if ($custom_url) {
-                $scheme = $scheme == '' ? 'http://' : $scheme;
-                if (strpos($custom_url, '/') !== false) {
-                    // custom contains querystring
-                    if (strpos($custom_url, '?') !== false) {
-                        return $scheme.$custom_url.$fragment;
+                $custom_url = $meta['customUrls'][$locale];
+                if ($custom_url) {
+                    $scheme = $scheme == '' ? 'http://' : $scheme;
+                    if (strpos($custom_url, '/') !== false) {
+                        // custom contains querystring
+                        if (strpos($custom_url, '?') !== false) {
+                            return $scheme.$custom_url.$fragment;
+                        }
+                        // custom contains path
+                        return $scheme.$custom_url.$query.$fragment;
                     }
-                    // custom contains path
-                    return $scheme.$custom_url.$query.$fragment;
+                    // custom is only domain
+                    return $scheme.$custom_url.$path.$query.$fragment;
                 }
-                // custom is only domain
-                return $scheme.$custom_url.$path.$query.$fragment;
-            }
-            break;
+                break;
             case 'querystring':
-            $query_locale = '';
-            if (!isset($parsed['query'])) {
-                return $scheme.$host.$port.$path.'?locale='.$locale.$fragment;
-            }
-            $output = array();
-            parse_str(Tools::substr($query, 1), $output);
-            $output['locale'] = $locale;
-            $query = http_build_query($output);
+                $query_locale = '';
+                if (!isset($parsed['query'])) {
+                    return $scheme.$host.$port.$path.'?locale='.$locale.$fragment;
+                }
+                $output = array();
+                parse_str(Tools::substr($query, 1), $output);
+                $output['locale'] = $locale;
+                $query = http_build_query($output);
 
-            return $scheme.$host.$port.$path.'?'.$query.$fragment;
+                return $scheme.$host.$port.$path.'?'.$query.$fragment;
             case 'subdir':
-            $locale_keys = $meta['localeKeys'];
-            $locale_regex = '('.implode('|', $locale_keys).')';
-            $path = preg_replace('/^(?:'.preg_quote($this->subdir_base, '/').')?\/'.$locale_regex.'\//', '/', $path);
-            $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
-
-            return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
+                $locale_keys = $meta['localeKeys'];
+                $locale_regex = '('.implode('|', $locale_keys).')';
+                $path = preg_replace('/^(?:'.preg_quote($this->subdir_base, '/').')?\/'.$locale_regex.'\//', '/', $path);
+                $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
+                return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':
-            $fragment = '#locale_'.$locale;
-
-            return $scheme.$host.$port.$path.$query.$fragment;
+                $fragment = '#locale_'.$locale;
+                return $scheme.$host.$port.$path.$query.$fragment;
         }
 
         return $url;
@@ -438,7 +436,7 @@ class BablicSDK
         }
         $detected = '';
         if ($auto && !empty($locale_keys)) {
-            $detected_lang = $this->detect_locale_from_header();
+            $detected_lang = $this->detectLocaleFromHeader();
             $normalized_lang = Tools::strtolower(str_replace('-', '_', $detected_lang));
             foreach ($locale_keys as &$value) {
                 if ($value === $normalized_lang) {
@@ -455,42 +453,41 @@ class BablicSDK
         $parsed_url = parse_url($this->getCurrentUrl());
         switch ($locale_detection) {
             case 'querystring':
-            if (!empty(Tools::getValue('locale'))) {
-                return Tools::getValue('locale');
-            } elseif ($from_cookie) {
-                return $from_cookie;
-            } elseif ($detected) {
-                return $detected;
-            }
-
-            return $default;
-            case 'subdir':
-            $path = $parsed_url['path'];
-            preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
-            if ($matches) {
-                return $matches[2];
-            }
-            if ($from_cookie) {
-                return $default;
-            }
-            if ($detected) {
-                return $detected;
-            }
-
-            return $default;
-            case 'custom':
-            foreach ($custom_urls as &$value) {
-                $pattern = $this->createDomainRegex($value);
-                if (preg_match($pattern, $parsed_url['host'], $matches)) {
-                    return $value;
+                if (!empty(Tools::getValue('locale'))) {
+                    return Tools::getValue('locale');
+                } elseif ($from_cookie) {
+                    return $from_cookie;
+                } elseif ($detected) {
+                    return $detected;
                 }
-            }
 
-            return $default;
+                return $default;
+            case 'subdir':
+                $path = $parsed_url['path'];
+                preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
+                if ($matches) {
+                    return $matches[2];
+                }
+                if ($from_cookie) {
+                    return $default;
+                }
+                if ($detected) {
+                    return $detected;
+                }
+
+                return $default;
+            case 'custom':
+                foreach ($custom_urls as &$value) {
+                    $pattern = $this->createDomainRegex($value);
+                    if (preg_match($pattern, $parsed_url['host'], $matches)) {
+                        return $value;
+                    }
+                }
+
+                return $default;
             default:
-            return $from_cookie;
+                return $from_cookie;
         }
-
         return;
     }
     private function createDomainRegex($str)
@@ -610,7 +607,7 @@ class BablicSDK
     {
         return md5($url);
     }
-    private function full_path_from_url($url)
+    private function fullPathFromUrl($url)
     {
         $tmp_dir = sys_get_temp_dir();
         $folder = "$tmp_dir/bablic_cache";
@@ -649,7 +646,7 @@ class BablicSDK
             return $html;
         }
         curl_close($curl);
-        $this->saveHtml($response, $this->full_path_from_url($url));
+        $this->saveHtml($response, $this->fullPathFromUrl($url));
 
         return $response;
     }
@@ -665,7 +662,7 @@ class BablicSDK
     }
     public function getHtmlForUrl($url)
     {
-        $cached_file = $this->readFromCache($this->full_path_from_url($url));
+        $cached_file = $this->readFromCache($this->fullPathFromUrl($url));
         if ($cached_file) {
             exit;
 
@@ -700,4 +697,3 @@ class BablicSDK
         }
     }
 }
-?>

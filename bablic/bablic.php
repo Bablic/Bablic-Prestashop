@@ -161,10 +161,10 @@ class Bablic extends Module {
             <form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data">
               <fieldset>
             <input type="hidden" name="check" value="yes" />
-            <input type="hidden" id="bablic_raw_data" value=\''. $this->sdk->get_meta() . '\' />
+            <input type="hidden" id="bablic_raw_data" value=\''. $this->sdk->getMeta() . '\' />
             <input type="hidden" id="bablic_siteid" value="'. $this->sdk->site_id . '" />
             <input type="hidden" id="bablic_trial" value="'.$this->sdk->trial_started.'" />
-            <input type="hidden" id="bablic_editor" value="'.$this->sdk->editor_url().'" />
+            <input type="hidden" id="bablic_editor" value="'.$this->sdk->editorUrl().'" />
             <input type="hidden" id="bablic_token" value="'.$this->sdk->access_token.'" />
             <input type="hidden" id="bablic_data" name="bablic_data" value="{}" />';
   	  if (empty($this->sdk->site_id)) {
