@@ -202,4 +202,3 @@ class Bablic extends Module
          $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
     }
 }
-
