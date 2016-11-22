@@ -46,9 +46,9 @@ class Bablic extends Module
             array(
               'channel_id' => 'prestashop',
               'store' => new BablicPrestashopStore(),
-              'use_snippet_url' => true,
+              'use_snippet_url' => true
             )
-          );
+        );
 
         if (startsWith($controller, 'Admin')) {
             return;
@@ -82,7 +82,7 @@ class Bablic extends Module
         }
     }
 
-    private function site_create()
+    private function siteCreate()
     {
         $rslt = $this->sdk->createSite(
             array(
@@ -101,7 +101,7 @@ class Bablic extends Module
         $action = isset($data['action']) ? $data['action'] : '';
         switch ($action) {
             case 'create':
-                $this->site_create();
+                $this->siteCreate();
                 if (!$this->sdk->site_id) {
                     $error = 'There was a problem registering this site, please check that website is online and there is that Bablic snippet was not integrated before.';
                 } else {
@@ -202,3 +202,4 @@ class Bablic extends Module
          $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
     }
 }
+
