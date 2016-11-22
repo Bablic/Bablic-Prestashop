@@ -27,7 +27,7 @@ class Bablic_Prestashop_store {
 require_once("sdk.php");
 
 function startsWith($haystack, $needle) {
-    return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== false;
+    return $needle === "" || strrpos($haystack, $needle, - Tools::strlen($haystack)) !== false;
 }
 
 class Bablic extends Module {
@@ -49,7 +49,7 @@ class Bablic extends Module {
           $this->displayName = $this->l('Bablic Localization');
           $this->description = $this->l('Connects your Prestashop to every language instantly');
 
-          $controller = $_GET['controller'];
+          $controller = Tools::getValue('controller');
           $this->sdk = new BablicSDK(
             array(
               'channel_id' => 'prestashop',
@@ -64,7 +64,8 @@ class Bablic extends Module {
         }
 
 	public function uninstall() {
-	  Configuration::updateValue('bablic_uninstalled', 'true');
+	   Configuration::updateValue('bablic_uninstalled', 'true');
+	   return true;
 	}
 
 	public function install() {
