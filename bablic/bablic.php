@@ -60,7 +60,7 @@ class Bablic extends Module {
 
           if(startsWith($controller,'Admin'))
             return;
-          $this->sdk->handle_request();
+          $this->sdk->handleRequest();
         }
 
 	public function uninstall() {
@@ -84,7 +84,7 @@ class Bablic extends Module {
 	}
 
 	private function site_create(){
-          $rslt = $this->sdk->create_site(
+          $rslt = $this->sdk->createSite(
             array(
                 'site_url' => Tools::getHttpHost(true).__PS_BASE_URI__
             )
@@ -109,7 +109,7 @@ class Bablic extends Module {
                 break;
             case 'set':
                 $site =$data['site'];
-                $this->sdk->set_site($site);
+                $this->sdk->setSite($site);
                 $message = '';
                 break;
             case 'keep':
@@ -117,17 +117,17 @@ class Bablic extends Module {
                 break;
             case 'clear':
                 Configuration::updateValue('bablic_uninstalled', '');
-                $this->sdk->remove_site();
+                $this->sdk->removeSite();
                 break;
     	    case 'update':
-                $this->sdk->refresh_site();
+                $this->sdk->refreshSite();
                 break;
             case 'delete':
-                $this->sdk->remove_site();
+                $this->sdk->removeSite();
                 $message = 'Website was deleted from Bablic';
                 break;
         }
-      $this->sdk->clear_cache();
+      $this->sdk->clearCache();
 
 	  if($error != '')
 	    $this->_html .= '<div class="alert error">'.$error.'</div>';
@@ -148,7 +148,7 @@ class Bablic extends Module {
 				}
 			}
 		}
-        $this->sdk->refresh_site();
+        $this->sdk->refreshSite();
 
 		$this->_displayForm();
 		$this->_html .= '</div>';
@@ -178,8 +178,8 @@ class Bablic extends Module {
 	}
 
 	public function hookdisplayHeader($params){
-		$header = $this->sdk->get_bablic_top();
-		$footer = $this->sdk->get_bablic_bottom();
+		$header = $this->sdk->getBablicTop();
+		$footer = $this->sdk->getBablicBottom();
 		$footer = preg_replace('/<script /i', '<script async ', $footer);
 		$html = '<!-- Bablic V' . $this->version . ' -->' . $header . $footer;
         return htmlspecialchars_decode($html);
