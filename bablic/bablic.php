@@ -13,6 +13,7 @@
  * @copyright Bablic 2016
  * @license   http://www.gnu.org/licenses/ GNU License
  */
+
 require_once 'sdk.php';
 require_once 'store.php';
 
