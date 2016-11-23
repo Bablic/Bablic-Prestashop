@@ -13,7 +13,7 @@
  * @license   http://www.gnu.org/licenses/ GNU License
  */
 
-<!-- start Bablic Head {$version} -->
+<!-- start Bablic Head {$version|escape:'htmlall':'UTF-8'} -->
 {foreach from=$locales item=locale}
     <link rel="alternate" href="{$locale[0]|escape:'htmlall':'UTF-8'}" hreflang="{$locale[1]|escape:'htmlall':'UTF-8'}">
 {/foreach}

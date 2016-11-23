@@ -20,7 +20,7 @@ function startsWith($haystack, $needle)
 {
     return $needle === '' || strrpos($haystack, $needle, -Tools::strlen($haystack)) !== false;
 }
-class bablic extends Module
+class Bablic extends Module
 {
     private $_html = '';
     private $_postErrors = array();
