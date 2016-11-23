@@ -13,7 +13,6 @@
  * @copyright Bablic 2016
  * @license   http://www.gnu.org/licenses/ GNU License
  */
-
 class BablicSDK
 {
     public $site_id = '';
@@ -220,7 +219,8 @@ class BablicSDK
     public function getSnippet()
     {
         $locale = $this->getLocale();
- 	return $this->snippet;
+
+        return $this->snippet;
     }
 
     public function getBablicTop()
@@ -259,17 +259,18 @@ class BablicSDK
         $locale = $this->getLocale();
         $url = $_SERVER['REQUEST_URI'];
         $str = '';
-	$res = array();
+        $res = array();
         if (is_array($locale_keys)) {
             foreach ($locale_keys as $alt) {
                 if ($alt != $locale) {
-		    array_push($res, [$this->getLink($alt, $url), $alt]);
+                    array_push($res, [$this->getLink($alt, $url), $alt]);
                 }
             }
             if ($locale != $meta['original']) {
-		array_push($res, [$this->getLink($meta['original'], $url), $meta['original']]);
+                array_push($res, [$this->getLink($meta['original'], $url), $meta['original']]);
             }
         }
+
         return $res;
     }
     public function altTags()
@@ -388,9 +389,11 @@ class BablicSDK
                 $locale_regex = '('.implode('|', $locale_keys).')';
                 $path = preg_replace('/^(?:'.preg_quote($this->subdir_base, '/').')?\/'.$locale_regex.'\//', '/', $path);
                 $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
+
                 return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':
                 $fragment = '#locale_'.$locale;
+
                 return $scheme.$host.$port.$path.$query.$fragment;
         }
 
@@ -485,6 +488,7 @@ class BablicSDK
             default:
                 return $from_cookie;
         }
+
         return;
     }
     private function createDomainRegex($str)
