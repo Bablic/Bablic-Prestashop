@@ -205,9 +205,9 @@ class Bablic extends Module
             $was_installed = Configuration::get('bablic_uninstalled');
             if ($was_installed != '') {
                 array_push($fields_form[0]['form']['array'], array(
-            'type' => 'hidden',
-            'name' => 'bablic_uninstalled',
-        ));
+                    'type' => 'hidden',
+                    'name' => 'bablic_uninstalled',
+                ));
                 $helper->fields_value['bablic_uninstalled'] = $this->sdk->getMeta();
             }
         }
