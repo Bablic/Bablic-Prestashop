@@ -164,37 +164,37 @@ class Bablic extends Module
     private function _displayForm()
     {
         $fields_form[0]['form'] = array(
-        'input' => array(
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_raw_data',
+            'input' => array(
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_raw_data',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_siteId',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_trial',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_editor',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_token',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'bablic_data',
+                ),
+                array(
+                    'type' => 'hidden',
+                    'name' => 'check',
+                ),
             ),
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_siteId',
-            ),
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_trial',
-            ),
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_editor',
-            ),
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_token',
-            ),
-            array(
-                'type' => 'hidden',
-                'name' => 'bablic_data',
-            ),
-            array(
-                'type' => 'hidden',
-                'name' => 'check',
-            ),
-        ),
-    );
+        );
         $helper = new HelperForm();
         $helper->module = $this;
         $helper->title = $this->displayName;
