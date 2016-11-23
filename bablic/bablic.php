@@ -154,7 +154,7 @@ class Bablic extends Module
         }
         $this->sdk->refreshSite();
 
-        $this->_displayForm();
+        return $this->_displayForm();
         $this->_html .= '</div>';
 
         return $this->_html;
@@ -162,43 +162,79 @@ class Bablic extends Module
 
     private function _displayForm()
     {
-        $this->_html .= '
-            <form id="bablicForm" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data">
-              <fieldset>
-            <input type="hidden" name="check" value="yes" />
-            <input type="hidden" id="bablic_raw_data" value=\''.$this->sdk->getMeta().'\' />
-            <input type="hidden" id="bablic_siteid" value="'.$this->sdk->site_id.'" />
-            <input type="hidden" id="bablic_trial" value="'.$this->sdk->trial_started.'" />
-            <input type="hidden" id="bablic_editor" value="'.$this->sdk->editorUrl().'" />
-            <input type="hidden" id="bablic_token" value="'.$this->sdk->access_token.'" />
-            <input type="hidden" id="bablic_data" name="bablic_data" value="{}" />';
+	$fields_form[0]['form'] = array(
+		'input' => array( 
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_raw_data',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_siteId',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_trial',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_editor',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_token',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'bablic_data',
+			),
+			array(
+				'type' => 'hidden',
+				'name' => 'check',
+			)
+		)
+	);
+	$helper = new HelperForm();
+	$helper->module = $this;
+	$helper->title = $this->displayName;
+        $helper->name_controller = 'bablic_container';
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         if (empty($this->sdk->site_id)) {
             $was_installed = Configuration::get('bablic_uninstalled');
             if ($was_installed != '') {
-                $this->_html .= '<input type="hidden" id="bablic_uninstalled"></span>';
+		array_push($fields_form[0]['form']['array'], array(
+			'type' => 'hidden',
+			'name' => 'bablic_uninstalled',
+		));
+		$helper->fields_value['bablic_uninstalled'] = $this->sdk->getMeta(); 
             }
-            $this->_html .= ' </fieldset> </form>';
-
-            return;
         }
-        $this->_html .= ' </fieldset> </form>';
+	$helper->fields_value['bablic_raw_data'] = $this->sdk->getMeta(); 
+	$helper->fields_value['bablic_siteId'] = $this->sdk->site_id; 
+	$helper->fields_value['bablic_trial'] = $this->sdk->trial_started; 
+	$helper->fields_value['bablic_editor'] = $this->sdk->editorUrl(); 
+	$helper->fields_value['bablic_token'] = $this->sdk->access_token; 
+	$helper->fields_value['bablic_data'] = '{}'; 
+	$helper->fields_value['check'] = 'yes'; 
+        return $helper->generateForm($fields_form);
     }
 
     public function hookdisplayHeader($params)
     {
-        $header = $this->sdk->getBablicTop();
-        $footer = $this->sdk->getBablicBottom();
-        $footer = preg_replace('/<script /i', '<script async ', $footer);
-        $html = '<!-- Bablic V'.$this->version.' -->'.$header.$footer;
-
-        return htmlspecialchars_decode($html);
+	$alt_tags = $this->sdk->getAltTags();
+	$this->context->smarty->assign('version', $this->version);
+	$this->context->smarty->assign('locales', $alt_tags);
+	$this->context->smarty->assign('snippet_url', $this->sdk->getSnippet());
+	$this->context->smarty->assign('async', ($this->sdk->getLocale() == $this->sdk->getOriginal()));
+	return $this->display(__FILE__, 'altTags.tpl');
     }
 
     public function hookDisplayBackOfficeHeader()
     {
-//                $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
-//               $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
-         $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
+                $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
+               $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
+//         $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
          $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
     }
 }

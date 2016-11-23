@@ -181,7 +181,7 @@ class BablicSDK
             $this->access_token = $result['access_token'];
         }
         $this->site_id = $result['id'];
-        $this->snippet = $this->use_snippet_url ? '<script type="text/javascript" src="'.$result['snippetURL'].'"></script>' : $result['snippet'];
+        $this->snippet = $this->use_snippet_url ? $result['snippetURL'] : $result['snippet'];
         $this->version = $result['version'];
         $this->trial_started = $result['trialStarted'];
         $this->meta = Tools::jsonEncode($result['meta']);
@@ -216,16 +216,13 @@ class BablicSDK
             'snippet' => $this->snippet,
         );
     }
+
     public function getSnippet()
     {
-        if ($this->subdir) {
-            $locale = $this->getLocale();
-
-            return '<script type="text/javascript">var bablic=bablic||{};bablic.localeURL="subdir";bablic.subDirBase="'.$this->subdir_base.'";bablic.locale="'.$locale.'"</script>'.$this->snippet;
-        }
-
-        return $this->snippet;
+        $locale = $this->getLocale();
+ 	return $this->snippet;
     }
+
     public function getBablicTop()
     {
         return '<!-- start Bablic Head -->'.$this->getAltTags().($this->getLocale() != $this->getOriginal() ? $this->getSnippet() : '').'<!-- end Bablic Head -->';
@@ -262,18 +259,18 @@ class BablicSDK
         $locale = $this->getLocale();
         $url = $_SERVER['REQUEST_URI'];
         $str = '';
+	$res = array();
         if (is_array($locale_keys)) {
             foreach ($locale_keys as $alt) {
                 if ($alt != $locale) {
-                    $str .= '<link rel="alternate" href="'.$this->getLink($alt, $url).'" hreflang="'.$alt.'">';
+		    array_push($res, [$this->getLink($alt, $url), $alt]);
                 }
             }
             if ($locale != $meta['original']) {
-                $str .= '<link rel="alternate" href="'.$this->getLink($meta['original'], $url).'" hreflang="'.$meta['original'].'">';
+		array_push($res, [$this->getLink($meta['original'], $url), $meta['original']]);
             }
         }
-
-        return $str;
+        return $res;
     }
     public function altTags()
     {
