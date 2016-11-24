@@ -130,35 +130,12 @@ class Bablic extends Module
                 break;
         }
         $this->sdk->clearCache();
-
-        if ($error != '') {
-            $this->_html .= '<div class="alert error">'.$error.'</div>';
-        }
-        if ($message != '') {
-            $this->_html .= '<div class="conf confirm">'.$message.'</div>';
-        }
     }
 
     public function getContent()
     {
-        $this->_html .= '<div style="position: relative; height: 78.5vh; margin-left: -10px; margin-top: -20px;" class="bablic_container">';
-        if (Tools::getValue('check') == 'yes') {
-            $this->_postValidation();
-
-            if (!sizeof($this->_postErrors)) {
-                $this->_postProcess();
-            } else {
-                foreach ($this->_postErrors as $err) {
-                    $this->_html .= '<div class="alert error">'.$err.'</div>';
-                }
-            }
-        }
         $this->sdk->refreshSite();
-
         return $this->_displayForm();
-        $this->_html .= '</div>';
-
-        return $this->_html;
     }
 
     private function _displayForm()
@@ -235,8 +212,8 @@ class Bablic extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
-        $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
-        $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
+//        $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
+//        $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
 //         $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
          $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
     }
