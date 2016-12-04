@@ -84,7 +84,7 @@ class Bablic extends Module
     public function uninstall()
     {
         Configuration::updateValue('bablic_uninstalled', 'true');
-        return true;
+        return parent::uninstall();
     }
 
     /**
@@ -183,6 +183,7 @@ class Bablic extends Module
      */
     protected function getConfigFormValues()
     {
+        $this->sdk->refreshSite();        
         $values = array();
         $was_installed = Configuration::get('bablic_uninstalled');
         $values['bablic_uninstalled'] = $was_installed == '' ? '' : 'true';
@@ -243,9 +244,7 @@ class Bablic extends Module
     public function hookBackOfficeHeader()
     {
         if (Tools::getValue('module_name') == $this->name) {
-            $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
-            $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
-            //$this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
+            $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
             $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
         }
     }
