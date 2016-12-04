@@ -2,11 +2,10 @@
 <module>
 	<name>bablic</name>
 	<displayName><![CDATA[Bablic Localization]]></displayName>
-	<version><![CDATA[0.2.2]]></version>
+	<version><![CDATA[1.0.0]]></version>
 	<description><![CDATA[Connects your Prestashop to every language instantly]]></description>
 	<author><![CDATA[Ishai Jaffe]]></author>
-	<tab><![CDATA[front_office_features]]></tab>
-	<confirmUninstall><![CDATA[Please note, Bablic will not delete your account or changes. Please visit Bablic in order to delete your account or cancel your subscription if need be.]]></confirmUninstall>
+	<tab><![CDATA[i18n_localization]]></tab>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
 	<limited_countries></limited_countries>

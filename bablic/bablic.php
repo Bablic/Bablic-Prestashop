@@ -1,18 +1,32 @@
 <?php
 /**
- * Bablic Localization.
- *
- * LICENSE: This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @category  localization
- *
- * @author    Ishai Jaffe <ishai@bablic.com>
- * @copyright Bablic 2016
- * @license   http://www.gnu.org/licenses/ GNU License
- */
+* 2007-2015 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 require_once 'sdk.php';
 require_once 'store.php';
@@ -21,25 +35,28 @@ function startsWith($haystack, $needle)
 {
     return $needle === '' || strrpos($haystack, $needle, -Tools::strlen($haystack)) !== false;
 }
+
 class Bablic extends Module
 {
-    private $_html = '';
-    private $_postErrors = array();
+    protected $config_form = false;
+
     public function __construct()
     {
-        $version_mask = explode('.', _PS_VERSION_, 3);
-        $version_test = $version_mask[0] > 0 && $version_mask[1] > 3;
         $this->name = 'bablic';
-        $this->tab = 'front_office_features'; //$version_test ? 'front_office_features' : 'Tools';
+        $this->tab = 'i18n_localization';
+        $this->version = '1.0.0';
+        $this->author = 'Bablic';
+        $this->need_instance = 0;
         $this->author = 'Ishai Jaffe';
-        $this->version = '0.2.2';
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
         $this->module_key = '85b91d2e4c985df4f58cdc3beeaaa87d';
         parent::__construct();
 
         $this->displayName = $this->l('Bablic Localization');
         $this->description = $this->l('Connects your Prestashop to every language instantly');
+
+        $this->confirmUninstall = $this->l('Please note, this will not delete your account. Please visit Bablic.com in order to delete your account or cancel your subscription if need be. Do you wish to continue?');
 
         $controller = Tools::getValue('controller');
         $this->sdk = new BablicSDK(
@@ -54,47 +71,135 @@ class Bablic extends Module
             return;
         }
         $this->sdk->handleRequest();
+
+    }
+
+    public function install()
+    {
+        return parent::install() &&
+            $this->registerHook('backOfficeHeader') &&
+            $this->registerHook('displayHeader');
     }
 
     public function uninstall()
     {
         Configuration::updateValue('bablic_uninstalled', 'true');
-
         return true;
     }
 
-    public function install()
+    /**
+     * Load the configuration form
+     */
+    public function getContent()
     {
-        parent::install();
-        if (!$this->registerHook('displayHeader')) {
-            return false;
-        }
-        if (!$this->registerHook('displayBackOfficeHeader')) {
-            return false;
+        /**
+         * If values have been submitted in the form, process.
+         */
+        if (((bool)Tools::isSubmit('submitBablicModule')) == true) {
+            $this->postProcess();
         }
 
-        return true;
+        $this->context->smarty->assign('module_dir', $this->_path);
+
+        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+
+        return $output.$this->renderForm();
     }
 
-    private function _postValidation()
+    /**
+     * Create the form that will be displayed in the configuration of your module.
+     */
+    protected function renderForm()
     {
-        if (!Validate::isCleanHtml(Tools::getValue('activate_bablic'))) {
-            $this->_postErrors[] = $this->l('The message you entered was not allowed, sorry');
-        }
-    }
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->title = $this->displayName;
+        $helper->name_controller = 'bablic_container';        
+        $helper->default_form_language = $this->context->language->id;
+        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
-    private function siteCreate()
-    {
-        $rslt = $this->sdk->createSite(
-            array(
-                'site_url' => Tools::getHttpHost(true).__PS_BASE_URI__,
-            )
+        $helper->identifier = $this->identifier;
+        $helper->submit_action = 'submitBablicModule';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
         );
 
-        return empty($rslt['error']);
+        return $helper->generateForm(array($this->getConfigForm()));
     }
 
-    private function _postProcess()
+    /**
+     * Create the structure of your form.
+     */
+    protected function getConfigForm()
+    {
+        return array(
+            'form' => array(
+                'input' => array(
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_raw_data',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_siteId',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_trial',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_editor',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_token',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_data',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'check',
+                    ),
+                    array(
+                        'type' => 'hidden',
+                        'name' => 'bablic_uninstalled',
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Set values for the inputs.
+     */
+    protected function getConfigFormValues()
+    {
+        $values = array();
+        $was_installed = Configuration::get('bablic_uninstalled');
+        $values['bablic_uninstalled'] = $was_installed == '' ? '' : 'true';
+        $values['bablic_raw_data'] = $this->sdk->getMeta();
+        $values['bablic_siteId'] = $this->sdk->site_id;
+        $values['bablic_trial'] = $this->sdk->trial_started;
+        $values['bablic_editor'] = $this->sdk->editorUrl();
+        $values['bablic_token'] = $this->sdk->access_token;
+        $values['bablic_data'] = '{}';
+        $values['check'] = 'yes';
+        return $values;
+    }
+
+    /**
+     * Save form data.
+     */
+    protected function postProcess()
     {
         $data = Tools::jsonDecode(Tools::getValue('bablic_data'), true);
         $message = '';
@@ -132,74 +237,20 @@ class Bablic extends Module
         $this->sdk->clearCache();
     }
 
-    public function getContent()
+    /**
+    * Add the CSS & JavaScript files you want to be loaded in the BO.
+    */
+    public function hookBackOfficeHeader()
     {
-        $this->sdk->refreshSite();
-        return $this->_displayForm();
-    }
-
-    private function _displayForm()
-    {
-        $fields_form[0]['form'] = array(
-            'input' => array(
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_raw_data',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_siteId',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_trial',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_editor',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_token',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_data',
-                ),
-                array(
-                    'type' => 'hidden',
-                    'name' => 'check',
-                ),
-            ),
-        );
-        $helper = new HelperForm();
-        $helper->module = $this;
-        $helper->title = $this->displayName;
-        $helper->name_controller = 'bablic_container';
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-        if (empty($this->sdk->site_id)) {
-            $was_installed = Configuration::get('bablic_uninstalled');
-            if ($was_installed != '') {
-                array_push($fields_form[0]['form']['array'], array(
-                    'type' => 'hidden',
-                    'name' => 'bablic_uninstalled',
-                ));
-                $helper->fields_value['bablic_uninstalled'] = $this->sdk->getMeta();
-            }
+        if (Tools::getValue('module_name') == $this->name) {
+            $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
+            $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
+            //$this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
+            $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
         }
-        $helper->fields_value['bablic_raw_data'] = $this->sdk->getMeta();
-        $helper->fields_value['bablic_siteId'] = $this->sdk->site_id;
-        $helper->fields_value['bablic_trial'] = $this->sdk->trial_started;
-        $helper->fields_value['bablic_editor'] = $this->sdk->editorUrl();
-        $helper->fields_value['bablic_token'] = $this->sdk->access_token;
-        $helper->fields_value['bablic_data'] = '{}';
-        $helper->fields_value['check'] = 'yes';
-
-        return $helper->generateForm($fields_form);
     }
 
-    public function hookdisplayHeader($params)
+    public function hookDisplayHeader()
     {
         $alt_tags = $this->sdk->getAltTags();
         $this->context->smarty->assign('version', $this->version);
@@ -209,12 +260,14 @@ class Bablic extends Module
 
         return $this->display(__FILE__, 'altTags.tpl');
     }
-
-    public function hookDisplayBackOfficeHeader()
+    
+    private function siteCreate()
     {
-//        $this->context->controller->addJS('//dev.bablic.com/js/sdk.js');
-//        $this->context->controller->addJS('//dev.bablic.com/js/addons/prestashop.js');
-//         $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
-         $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
+        $rslt = $this->sdk->createSite(
+            array(
+                'site_url' => Tools::getHttpHost(true).__PS_BASE_URI__,
+            )
+        );
+        return empty($rslt['error']);
     }
 }
