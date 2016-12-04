@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -114,7 +114,7 @@ class Bablic extends Module
         $helper = new HelperForm();
         $helper->show_toolbar = false;
         $helper->title = $this->displayName;
-        $helper->name_controller = 'bablic_container';        
+        $helper->name_controller = 'bablic_container';
         $helper->default_form_language = $this->context->language->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
