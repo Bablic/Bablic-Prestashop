@@ -183,7 +183,7 @@ class Bablic extends Module
      */
     protected function getConfigFormValues()
     {
-        $this->sdk->refreshSite();        
+        $this->sdk->refreshSite();
         $values = array();
         $was_installed = Configuration::get('bablic_uninstalled');
         $values['bablic_uninstalled'] = $was_installed == '' ? '' : 'true';
