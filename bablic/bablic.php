@@ -243,7 +243,7 @@ class Bablic extends Module
     */
     public function hookBackOfficeHeader()
     {
-        if (Tools::getValue('module_name') == $this->name) {
+        if (Tools::getValue('module_name') == $this->name || Tools::getValue('configure') == $this->name) {
             $this->context->controller->addJS('//cdn2.bablic.com/addons/prestashop.js');
             $this->context->controller->addCSS('//cdn2.bablic.com/addons/prestashop.css');
         }
