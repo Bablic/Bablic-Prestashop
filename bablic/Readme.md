@@ -6,7 +6,7 @@ Easily translate your Prestashop website
 
 ## Contributing
 
-Bablic prestashop plugin is open-source, github: https://github.com/Bablic/Bablic-Prestashop
+Bablic prestashop plugin is open-source, github: https://github.com/Bablic/Bablic-Prestashop, Use pull requests to contribute
 
 ### Process in details
 
