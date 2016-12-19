@@ -140,9 +140,9 @@ class Bablic extends Module
     {
         return array(
             'form' => array(
-		'legend' => array(
-			'title' => "For more information visit <a href='https://www.bablic.com'>Bablic.com</a> or contact us at <a href='mailto: support@bablic.com'>support@bablic.com</a>"
-		),
+                'legend' => array(
+                    'title' => "For more information visit <a href='https://www.bablic.com'>Bablic.com</a> or contact us at <a href='mailto: support@bablic.com'>support@bablic.com</a>"
+                ),
                 'input' => array(
                     array(
                         'type' => 'hidden',
