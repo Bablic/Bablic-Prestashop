@@ -408,7 +408,8 @@ class BablicSDK
         $parsed_url = parse_url($this->getCurrentUrl());
         switch ($locale_detection) {
             case 'querystring':
-                if (!empty(Tools::getValue('locale'))) {
+                $tl = Tools::getValue('locale');
+                if (empty($tl)) {
                     return Tools::getValue('locale');
                 } elseif ($from_cookie) {
                     return $from_cookie;
