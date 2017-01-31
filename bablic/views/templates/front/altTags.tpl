@@ -9,7 +9,7 @@
  * @category  localization
  *
  * @author    Ishai Jaffe <ishai@bablic.com>
- * @copyright Bablic 2016
+ * @copyright Bablic 2017
  * @license   http://www.gnu.org/licenses/ GNU License
 *}
 
