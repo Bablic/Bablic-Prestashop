@@ -44,7 +44,7 @@ class Bablic extends Module
     {
         $this->name = 'bablic';
         $this->tab = 'i18n_localization';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Bablic';
         $this->need_instance = 0;
         $this->author = 'Ishai Jaffe';
