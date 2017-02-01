@@ -153,7 +153,7 @@ class BablicSDK
         }
         $this->access_token = $result['access_token'];
         $this->site_id = $result['id'];
-        $this->snippet = $result['snippet'];
+        $this->snippet = $this->use_snippet_url ? $result['snippetURL'] : $result['snippet'];
         $this->version = $result['version'];
         $this->trial_started = false;
         $this->meta = Tools::jsonEncode($result['meta']);
