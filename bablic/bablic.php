@@ -44,7 +44,7 @@ class Bablic extends Module
     {
         $this->name = 'bablic';
         $this->tab = 'i18n_localization';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Bablic';
         $this->need_instance = 0;
         $this->author = 'Ishai Jaffe';
@@ -61,7 +61,7 @@ class Bablic extends Module
         $controller = Tools::getValue('controller');
         $this->sdk = new BablicSDK(
             array(
-              'channel_id' => 'prestashop',
+              'channel_id' => 'ps',
               'store' => new BablicPrestashopStore(),
               'use_snippet_url' => true,
             )
