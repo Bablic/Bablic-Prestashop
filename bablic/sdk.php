@@ -409,7 +409,7 @@ class BablicSDK
         switch ($locale_detection) {
             case 'querystring':
                 $tl = Tools::getValue('locale');
-                if (empty($tl)) {
+                if (!empty($tl)) {
                     return Tools::getValue('locale');
                 } elseif ($from_cookie) {
                     return $from_cookie;
