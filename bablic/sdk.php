@@ -295,6 +295,8 @@ class BablicSDK
     }
     public function getLink($locale, $url)
     {
+        if($url[0] != '/' && $url[0] != 'h')
+            return $url;
         $parsed = parse_url($url);
         $scheme = isset($parsed['scheme']) ? $parsed['scheme'].'://' : '';
         $host = isset($parsed['host']) ? $parsed['host'] : '';
@@ -342,7 +344,10 @@ class BablicSDK
             case 'subdir':
                 $locale_keys = $meta['localeKeys'];
                 $locale_regex = '('.implode('|', $locale_keys).')';
-                $path = preg_replace('/^(?:'.preg_quote($this->subdir_base, '/').')?\/'.$locale_regex.'\//', '/', $path);
+                if($this->subdir_base != "") {
+                     $path = preg_replace('/^'.preg_quote($this->subdir_base,'/').'\//','/',$path);
+		}     
+                $path =  preg_replace('/^'.$locale_regex.'\//','/',$path);
                 $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
 
                 return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
