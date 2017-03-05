@@ -21,7 +21,7 @@
   <script>
     var bablic = {};
     bablic.localeURL = 'subdir';
-    bablic.subDirBase = '{$subdir_base}';
+    bablic.subDirBase = '{$subdir_base|escape:'htmlall':'UTF-8'}';
 </script>
 {/if}
 <script data-cfasync="false"{if $async eq true} async{/if} src="{$snippet_url|escape:'htmlall':'UTF-8'}"></script>
