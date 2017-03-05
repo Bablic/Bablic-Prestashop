@@ -51,6 +51,7 @@ class Bablic extends Module
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
         $this->module_key = '85b91d2e4c985df4f58cdc3beeaaa87d';
+        $this->is_subdir = false;
         parent::__construct();
 
         $this->displayName = $this->l('Bablic Localization');
@@ -59,13 +60,18 @@ class Bablic extends Module
         $this->confirmUninstall = $this->l('Please note, this will not delete your account. Please visit Bablic.com in order to delete your account or cancel your subscription if need be. Do you wish to continue?');
 
         $controller = Tools::getValue('controller');
-        $this->sdk = new BablicSDK(
-            array(
-              'channel_id' => 'ps',
-              'store' => new BablicPrestashopStore(),
-              'use_snippet_url' => true,
-            )
+        $options = array(
+             'channel_id' => 'ps',
+             'store' => new BablicPrestashopStore(),
+             'use_snippet_url' => true
         );
+        $ps_langs = Language::getLanguages(true, $this->context->shop->id);
+        if (sizeof($ps_langs) > 1){
+            $options['subdir'] = true;
+            $this->is_subdir = true;
+            $options['subdir_base'] = $this->getDirBase();
+        }
+        $this->sdk = new BablicSDK($options);
 
         if (startsWith($controller, 'Admin')) {
             return;
@@ -241,6 +247,13 @@ class Bablic extends Module
         $this->sdk->clearCache();
     }
 
+    function getDirBase(){
+        $url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $path = parse_url($url, PHP_URL_PATH);
+        return preg_replace("/\/$/", "", $path);
+    }
+
+
     /**
     * Add the CSS & JavaScript files you want to be loaded in the BO.
     */
@@ -259,7 +272,8 @@ class Bablic extends Module
         $this->context->smarty->assign('locales', $alt_tags);
         $this->context->smarty->assign('snippet_url', $this->sdk->getSnippet());
         $this->context->smarty->assign('async', ($this->sdk->getLocale() == $this->sdk->getOriginal()));
-
+        $this->context->smarty->assign('subdir', $this->is_subdir);
+        $this->context->smarty->assign('subdir_base', $this->getDirBase());
         return $this->display(__FILE__, 'altTags.tpl');
     }
     
