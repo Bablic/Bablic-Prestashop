@@ -295,9 +295,9 @@ class BablicSDK
     }
     public function getLink($locale, $url)
     {
-        if($url[0] != '/' && $url[0] != 'h'){
+        if($url[0] != '/' && $url[0] != 'h') {
             return $url;
-        };
+        }
         $parsed = parse_url($url);
         $scheme = isset($parsed['scheme']) ? $parsed['scheme'].'://' : '';
         $host = isset($parsed['host']) ? $parsed['host'] : '';
