@@ -247,7 +247,7 @@ class Bablic extends Module
         $this->sdk->clearCache();
     }
 
-    function getDirBase(){
+    public function getDirBase(){
         $url = Tools::getHttpHost(true).__PS_BASE_URI__;
         $path = parse_url($url, PHP_URL_PATH);
         return preg_replace("/\/$/", "", $path);
