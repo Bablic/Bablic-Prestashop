@@ -295,7 +295,8 @@ class BablicSDK
     }
     public function getLink($locale, $url)
     {
-        if($url[0] != '/' && $url[0] != 'h') {
+        if($url[0] != '/' && $url[0] != 'h')
+        {
             return $url;
         }
         $parsed = parse_url($url);
@@ -346,7 +347,8 @@ class BablicSDK
             case 'subdir':
                 $locale_keys = $meta['localeKeys'];
                 $locale_regex = '('.implode('|', $locale_keys).')';
-                if($this->subdir_base != "") {
+                if($this->subdir_base != "")
+                {
                      $path = preg_replace('/^'.preg_quote($this->subdir_base, '/').'\//','/', $path);
                 };
                 $path =  preg_replace('/^'.$locale_regex.'\//', '/', $path);
