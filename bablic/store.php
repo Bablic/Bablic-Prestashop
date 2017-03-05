@@ -13,7 +13,6 @@
  * @copyright Bablic 2017
  * @license   http://www.gnu.org/licenses/ GNU License
  */
-
 class BablicPrestashopStore
 {
     public function get($key)

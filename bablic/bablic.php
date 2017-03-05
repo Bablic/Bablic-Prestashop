@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2017 PrestaShop
+* 2007-2017 PrestaShop.
 *
 * NOTICE OF LICENSE
 *
@@ -23,7 +23,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,7 +35,7 @@ function startsWith($haystack, $needle)
     return $needle === '' || strrpos($haystack, $needle, -Tools::strlen($haystack)) !== false;
 }
 
-class Bablic extends Module
+class bablic extends Module
 {
     protected $config_form = false;
 
@@ -63,10 +62,10 @@ class Bablic extends Module
         $options = array(
              'channel_id' => 'ps',
              'store' => new BablicPrestashopStore(),
-             'use_snippet_url' => true
+             'use_snippet_url' => true,
         );
         $ps_langs = Language::getLanguages(true, $this->context->shop->id);
-        if (sizeof($ps_langs) > 1){
+        if (sizeof($ps_langs) > 1) {
             $options['subdir'] = true;
             $this->is_subdir = true;
             $options['subdir_base'] = $this->getDirBase();
@@ -77,7 +76,6 @@ class Bablic extends Module
             return;
         }
         $this->sdk->handleRequest();
-
     }
 
     public function install()
@@ -90,18 +88,19 @@ class Bablic extends Module
     public function uninstall()
     {
         Configuration::updateValue('bablic_uninstalled', 'true');
+
         return parent::uninstall();
     }
 
     /**
-     * Load the configuration form
+     * Load the configuration form.
      */
     public function getContent()
     {
-        /**
+        /*
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitBablicModule')) == true) {
+        if (((bool) Tools::isSubmit('submitBablicModule')) == true) {
             $this->postProcess();
         }
 
@@ -147,7 +146,7 @@ class Bablic extends Module
         return array(
             'form' => array(
                 'legend' => array(
-                    'title' => "For more information visit <a href='https://www.bablic.com'>Bablic.com</a> or contact us at <a href='mailto: support@bablic.com'>support@bablic.com</a>"
+                    'title' => "For more information visit <a href='https://www.bablic.com'>Bablic.com</a> or contact us at <a href='mailto: support@bablic.com'>support@bablic.com</a>",
                 ),
                 'input' => array(
                     array(
@@ -203,6 +202,7 @@ class Bablic extends Module
         $values['bablic_token'] = $this->sdk->access_token;
         $values['bablic_data'] = '{}';
         $values['check'] = 'yes';
+
         return $values;
     }
 
@@ -247,16 +247,17 @@ class Bablic extends Module
         $this->sdk->clearCache();
     }
 
-    public function getDirBase(){
+    public function getDirBase()
+    {
         $url = Tools::getHttpHost(true).__PS_BASE_URI__;
         $path = parse_url($url, PHP_URL_PATH);
-        return preg_replace("/\/$/", "", $path);
+
+        return preg_replace("/\/$/", '', $path);
     }
 
-
     /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
+     * Add the CSS & JavaScript files you want to be loaded in the BO.
+     */
     public function hookBackOfficeHeader()
     {
         if (Tools::getValue('module_name') == $this->name || Tools::getValue('configure') == $this->name) {
@@ -274,9 +275,10 @@ class Bablic extends Module
         $this->context->smarty->assign('async', ($this->sdk->getLocale() == $this->sdk->getOriginal()));
         $this->context->smarty->assign('subdir', $this->is_subdir);
         $this->context->smarty->assign('subdir_base', $this->getDirBase());
+
         return $this->display(__FILE__, 'altTags.tpl');
     }
-    
+
     private function siteCreate()
     {
         $rslt = $this->sdk->createSite(
@@ -284,6 +286,7 @@ class Bablic extends Module
                 'site_url' => Tools::getHttpHost(true).__PS_BASE_URI__,
             )
         );
+
         return empty($rslt['error']);
     }
 }
