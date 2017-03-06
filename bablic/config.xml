@@ -2,7 +2,7 @@
 <module>
 	<name>bablic</name>
 	<displayName><![CDATA[Bablic Localization]]></displayName>
-	<version><![CDATA[1.0.4]]></version>
+	<version><![CDATA[1.0.5]]></version>
 	<description><![CDATA[Connects your Prestashop to every language instantly]]></description>
 	<author><![CDATA[Ishai Jaffe]]></author>
 	<tab><![CDATA[i18n_localization]]></tab>
