@@ -60,6 +60,13 @@ class BablicSDK
                 $this->getSiteFromBablic();
             }
         }
+        if($this->site_id){
+            try{
+                header('x-bablic-id: '.$this->site_id);
+            }
+            catch(Exception $e){
+            }
+        }
         if ($this->site_id && (empty($this->timestamp) || ((time() - $this->timestamp) > 12000))) {
             $this->timestamp = time();
             $this->getSiteFromBablic();
