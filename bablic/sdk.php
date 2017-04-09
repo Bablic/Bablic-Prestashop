@@ -252,11 +252,11 @@ class BablicSDK
         if (is_array($locale_keys)) {
             foreach ($locale_keys as $alt) {
                 if ($alt != $locale) {
-                    array_push($res, [$this->getLink($alt, $url), $alt]);
+                    array_push($res, array($this->getLink($alt, $url), $alt));
                 }
             }
             if ($locale != $meta['original']) {
-                array_push($res, [$this->getLink($meta['original'], $url), $meta['original']]);
+                array_push($res, array($this->getLink($meta['original'], $url), $meta['original']));
             }
         }
 
