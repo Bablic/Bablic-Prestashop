@@ -656,6 +656,7 @@ class BablicSDK
     private function sendToBablic($url, $html)
     {
         $bablic_url = "http://seo.bablic.com/api/engine/seo?site=$this->site_id&url=".urlencode($url).($this->subdir ? '&ld=subdir' : '').($this->subdir_base ? '&sdb='.urlencode($this->subdir_base) : '');
+        $bablic_url .= '&folders=' . urlencode(Tools::jsonEncode($this->folders));
         $curl = curl_init($bablic_url);
         $length = Tools::strlen($html);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
