@@ -87,7 +87,7 @@ class BablicSDK
             $this->use_snippet_url = true;
         }
         if(!empty($options['folders'])) {
-            $this->folders[$folder] = $options['folders'];
+            $this->folders = $options['folders'];
         }
     }
 
@@ -474,7 +474,10 @@ class BablicSDK
                 $path = $parsed_url['path'];
                 preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
                 if ($matches) {
-                    return $this->folders[$matches[2]] || $matches[2];
+                    if(!empty($this->folders[$matches[2]]) {
+                        return $this->folders[$matches[2]];
+                    }
+                    return $matches[2];
                 }
                 if ($from_cookie) {
                     return $default;
