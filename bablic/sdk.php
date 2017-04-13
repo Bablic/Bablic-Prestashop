@@ -457,7 +457,11 @@ class BablicSDK
                 $path = $parsed_url['path'];
                 preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
                 if ($matches) {
-                    return $this->folders[$matches[2]) || $matches[2];
+                    for($this->folders as $l => $folder){
+                        if($folder == $matches[2])
+                            return $l;
+                    }
+                    return $matches[2];
                 }
                 if ($from_cookie) {
                     return $default;
