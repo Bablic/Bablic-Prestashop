@@ -42,6 +42,7 @@ class BablicSDK
     private $pos = 0;
     private $timestamp = 0;
     private $use_snippet_url = false;
+    private $orig_path = '';
     public function __construct($options)
     {
         if (empty($options['channel_id'])) {
@@ -83,6 +84,9 @@ class BablicSDK
         }
         if (isset($options['use_snippet_url'])) {
             $this->use_snippet_url = true;
+        }
+        if(!empty($options['orig_path'])) {
+            $this->orig_path = $options['orig_path'];
         }
     }
     private function saveDataToStore()
@@ -256,7 +260,7 @@ class BablicSDK
                 }
             }
             if ($locale != $meta['original']) {
-                array_push($res, array($this->getLink($meta['original'], $url), $meta['original']));
+                array_push($res, array($this->getLink($meta['original'], $url), 'x-default'));
             }
         }
 
@@ -361,12 +365,12 @@ class BablicSDK
                 return $scheme.$host.$port.$path.'?'.$query.$fragment;
             case 'subdir':
                 $locale_keys = $meta['localeKeys'];
-                $locale_regex = '('.implode('|', $locale_keys).')';
+                $locale_regex = '('.implode('|', $locale_keys).'|'.$meta['original'].')';
                 if ($this->subdir_base != '') {
                     $path = preg_replace('/^'.preg_quote($this->subdir_base, '/').'\//', '/', $path);
                 }
                 $path = preg_replace('/^'.$locale_regex.'\//', '/', $path);
-                $prefix = $locale == $meta['original'] ? '' : '/'.$locale;
+                $prefix = $locale == $meta['original'] ? $this->orig_path : '/'.$locale;
 
                 return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':

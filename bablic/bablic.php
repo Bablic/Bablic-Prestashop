@@ -52,6 +52,7 @@ class Bablic extends Module
         $this->bootstrap = true;
         $this->module_key = '85b91d2e4c985df4f58cdc3beeaaa87d';
         $this->is_subdir = false;
+        $this->orig_path = '';
         parent::__construct();
 
         $this->displayName = $this->l('Bablic Localization');
@@ -70,6 +71,8 @@ class Bablic extends Module
             $options['subdir'] = true;
             $this->is_subdir = true;
             $options['subdir_base'] = $this->getDirBase();
+            $this->orig_path = $ps_langs[0]['lang_iso'];
+            $options['orig_path'] = $this->orig_path;
         }
         $this->sdk = new BablicSDK($options);
 
@@ -276,6 +279,7 @@ class Bablic extends Module
         $this->context->smarty->assign('async', ($this->sdk->getLocale() == $this->sdk->getOriginal()));
         $this->context->smarty->assign('subdir', $this->is_subdir);
         $this->context->smarty->assign('subdir_base', $this->getDirBase());
+        $this->context->smarty->assign('orig_path', $this->orig_path);
 
         return $this->display(__FILE__, 'altTags.tpl');
     }
