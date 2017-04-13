@@ -68,11 +68,17 @@ class Bablic extends Module
         );
         $ps_langs = Language::getLanguages(true, $this->context->shop->id);
         if (sizeof($ps_langs) > 1) {
+            $ps_iso_langs = array();
+            foreach ($ps_langs as $lang) {
+              $lang_code = Tools::strtolower(str_replace('-', '_', $lang['language_code']));
+              $ps_iso_langs[$lang['iso_code']] = $lang_code;
+            }
             $options['subdir'] = true;
             $this->is_subdir = true;
             $options['subdir_base'] = $this->getDirBase();
             $this->orig_path = $ps_langs[0]['lang_iso'];
             $options['orig_path'] = $this->orig_path;
+            $options['folders'] = $ps_iso_langs;
         }
         $this->sdk = new BablicSDK($options);
 
