@@ -23,7 +23,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -36,7 +35,7 @@ function startsWith($haystack, $needle)
     return $needle === '' || strrpos($haystack, $needle, -Tools::strlen($haystack)) !== false;
 }
 
-class Bablic extends Module
+class bablic extends Module
 {
     protected $config_form = false;
 
@@ -49,6 +48,7 @@ class Bablic extends Module
         $this->need_instance = 0;
         $this->author = 'Ishai Jaffe';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        $this->ps_iso_langs = null;
         $this->bootstrap = true;
         $this->module_key = '85b91d2e4c985df4f58cdc3beeaaa87d';
         $this->is_subdir = false;
@@ -70,15 +70,15 @@ class Bablic extends Module
         if (sizeof($ps_langs) > 1) {
             $ps_iso_langs = array();
             foreach ($ps_langs as $lang) {
-              $lang_code = Tools::strtolower(str_replace('-', '_', $lang['language_code']));
-              $ps_iso_langs[$lang['iso_code']] = $lang_code;
+                $lang_code = Tools::strtolower(str_replace('-', '_', $lang['language_code']));
+                $ps_iso_langs[$lang['iso_code']] = $lang_code;
+                $options['folders'] = $ps_iso_langs;
             }
             $this->ps_iso_langs = $ps_iso_langs;
             $options['subdir'] = true;
             $this->is_subdir = true;
             $options['subdir_base'] = $this->getDirBase();
             $this->orig_path = $ps_langs[0]['iso_code'];
-            $options['folders'] = $ps_iso_langs;
         }
         $this->sdk = new BablicSDK($options);
 
@@ -286,7 +286,9 @@ class Bablic extends Module
         $this->context->smarty->assign('subdir', $this->is_subdir);
         $this->context->smarty->assign('subdir_base', $this->getDirBase());
         $this->context->smarty->assign('orig_path', $this->orig_path);
-        $this->context->smarty->assign('folders_json', json_encode($this->ps_iso_langs));
+        if ($this->ps_iso_langs) {
+            $this->context->smarty->assign('folders_json', json_encode($this->ps_iso_langs));
+        }
 
         return $this->display(__FILE__, 'altTags.tpl');
     }

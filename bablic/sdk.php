@@ -23,7 +23,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
 class BablicSDK
 {
     public $site_id = '';
@@ -62,11 +61,10 @@ class BablicSDK
                 $this->getSiteFromBablic();
             }
         }
-        if($this->site_id){
-            try{
+        if ($this->site_id) {
+            try {
                 header('x-bablic-id: '.$this->site_id);
-            }
-            catch(Exception $e){
+            } catch (Exception $e) {
             }
         }
         if ($this->site_id && (empty($this->timestamp) || ((time() - $this->timestamp) > 12000))) {
@@ -86,37 +84,44 @@ class BablicSDK
         if (isset($options['use_snippet_url'])) {
             $this->use_snippet_url = true;
         }
-        if(!empty($options['folders'])) {
+        if (!empty($options['folders'])) {
             $this->folders = $options['folders'];
         }
     }
 
-    private function getFolder($locale) {
-        foreach($this->folders as $folder => $l) {
-            if($l == $locale)
+    private function getFolder($locale)
+    {
+        foreach ($this->folders as $folder => $l) {
+            if ($l == $locale) {
                 return $folder;
+            }
         }
         $locale = Tools::substr($locale, 0, 2);
-        foreach($this->folders as $folder => $l) {
-            if (Tools::substr($l, 0, 2) == $locale)
+        foreach ($this->folders as $folder => $l) {
+            if (Tools::substr($l, 0, 2) == $locale) {
                 return $folder;
+            }
         }
+
         return '';
     }
 
-    private function getLocaleFromFolder($folderLocale,$locales){
-        foreach($locales as $l) {
-            if($l == $folderLocale)
+    private function getLocaleFromFolder($folderLocale, $locales)
+    {
+        foreach ($locales as $l) {
+            if ($l == $folderLocale) {
                 return $l;
+            }
         }
         $folderLocale = Tools::substr($folderLocale, 0, 2);
-        foreach($locales as $l) {
-            if (Tools::substr($l, 0, 2) == $folderLocale)
+        foreach ($locales as $l) {
+            if (Tools::substr($l, 0, 2) == $folderLocale) {
                 return $l;
+            }
         }
+
         return $folderLocale;
     }
-
 
     private function saveDataToStore()
     {
@@ -285,8 +290,8 @@ class BablicSDK
         if (is_array($locale_keys)) {
             foreach ($locale_keys as $alt) {
                 if ($alt != $locale) {
-                    $parts = explode('_',$alt);
-                    $iso = sizeof($parts) > 1 ? $parts[0] .'-' . Tools::strtoupper($parts[1]) : $parts[0];
+                    $parts = explode('_', $alt);
+                    $iso = sizeof($parts) > 1 ? $parts[0].'-'.Tools::strtoupper($parts[1]) : $parts[0];
                     array_push($res, array($this->getLink($alt, $url), $iso));
                 }
             }
@@ -325,7 +330,7 @@ class BablicSDK
     }
     public function detectLocaleFromCookie($allowed_keys)
     {
-        if (!empty($_COOKIE) && !empty($_COOKIE['bab_locale']) && !empty($allowed_keys)) {
+        if (!empty(Context::getContext()->cookie) && !empty(Context::getContext()->cookie['bab_locale']) && !empty($allowed_keys)) {
             $cookie_locale = $_COOKIE['bab_locale'];
             $match = false;
             foreach ($allowed_keys as &$value) {
@@ -400,16 +405,16 @@ class BablicSDK
                 }
                 $folder_keys = array_keys($this->folders);
                 $prefix = '';
-                if(sizeof($folder_keys) > 0) {
-                    $prefix = '/' . $this->getFolder($locale);
+                if (sizeof($folder_keys) > 0) {
+                    $prefix = '/'.$this->getFolder($locale);
                     $locale_keys = $folder_keys;
-                }
-                else if($locale != $meta['original']){
-                    $prefix =  '/'.$locale;
+                } elseif ($locale != $meta['original']) {
+                    $prefix = '/'.$locale;
                     $locale_keys = $meta['localeKeys'];
                 }
                 $locale_regex = '('.implode('|', $locale_keys).')';
                 $path = preg_replace('/^\/?'.$locale_regex.'\//', '/', $path);
+
                 return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':
                 $fragment = '#locale_'.$locale;
@@ -487,11 +492,13 @@ class BablicSDK
                 $path = $parsed_url['path'];
                 preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
                 if ($matches) {
-                    if(!empty($this->folders[$matches[2]])) {
+                    if (!empty($this->folders[$matches[2]])) {
                         $folder = $this->folders[$matches[2]];
-                        array_push($locale_keys,$meta['original']);
-                        return $this->getLocaleFromFolder($folder,$locale_keys);
+                        array_push($locale_keys, $meta['original']);
+
+                        return $this->getLocaleFromFolder($folder, $locale_keys);
                     }
+
                     return $matches[2];
                 }
                 if ($from_cookie) {
@@ -656,7 +663,7 @@ class BablicSDK
     private function sendToBablic($url, $html)
     {
         $bablic_url = "http://seo.bablic.com/api/engine/seo?site=$this->site_id&url=".urlencode($url).($this->subdir ? '&ld=subdir' : '').($this->subdir_base ? '&sdb='.urlencode($this->subdir_base) : '');
-        $bablic_url .= '&folders=' . urlencode(Tools::jsonEncode($this->folders));
+        $bablic_url .= '&folders='.urlencode(Tools::jsonEncode($this->folders));
         $curl = curl_init($bablic_url);
         $length = Tools::strlen($html);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
