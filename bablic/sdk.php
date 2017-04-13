@@ -87,7 +87,7 @@ class BablicSDK
             $this->use_snippet_url = true;
         }
         if(!empty($options['folders'])) {
-            $this->folders[$folder] = $options['folders'];
+            $this->folders = $options['folders'];
         }
     }
 

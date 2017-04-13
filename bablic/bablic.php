@@ -73,11 +73,11 @@ class Bablic extends Module
               $lang_code = Tools::strtolower(str_replace('-', '_', $lang['language_code']));
               $ps_iso_langs[$lang['iso_code']] = $lang_code;
             }
+            $this->ps_iso_langs = $ps_iso_langs;
             $options['subdir'] = true;
             $this->is_subdir = true;
             $options['subdir_base'] = $this->getDirBase();
-            $this->orig_path = $ps_langs[0]['lang_iso'];
-            $options['orig_path'] = $this->orig_path;
+            $this->orig_path = $ps_langs[0]['iso_code'];
             $options['folders'] = $ps_iso_langs;
         }
         $this->sdk = new BablicSDK($options);
@@ -286,6 +286,7 @@ class Bablic extends Module
         $this->context->smarty->assign('subdir', $this->is_subdir);
         $this->context->smarty->assign('subdir_base', $this->getDirBase());
         $this->context->smarty->assign('orig_path', $this->orig_path);
+        $this->context->smarty->assign('folders_json', json_encode($this->ps_iso_langs));
 
         return $this->display(__FILE__, 'altTags.tpl');
     }
