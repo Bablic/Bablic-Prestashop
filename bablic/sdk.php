@@ -325,7 +325,6 @@ class BablicSDK
         $meta = Tools::jsonDecode($this->meta, true);
         $link = 'javascript:void(0);';
         $localeDetection = $meta['localeDetection'];
-        $store_locales = Language::getLanguages(true, $this->context->shop->id);
         if ($this->subdir) {
             $localeDetection = 'subdir';
         }
