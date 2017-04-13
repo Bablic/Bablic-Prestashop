@@ -43,6 +43,7 @@ class BablicSDK
     private $timestamp = 0;
     private $use_snippet_url = false;
     private $orig_path = '';
+    private $folders = array();
     public function __construct($options)
     {
         if (empty($options['channel_id'])) {
@@ -85,8 +86,8 @@ class BablicSDK
         if (isset($options['use_snippet_url'])) {
             $this->use_snippet_url = true;
         }
-        if(!empty($options['orig_path'])) {
-            $this->orig_path = $options['orig_path'];
+        if(!empty($options['folders'])) {
+            $this->folders = $options['folders'];
         }
     }
     private function saveDataToStore()
@@ -364,14 +365,21 @@ class BablicSDK
 
                 return $scheme.$host.$port.$path.'?'.$query.$fragment;
             case 'subdir':
-                $locale_keys = $meta['localeKeys'];
-                $locale_regex = '('.implode('|', $locale_keys).'|'.$meta['original'].')';
                 if ($this->subdir_base != '') {
                     $path = preg_replace('/^'.preg_quote($this->subdir_base, '/').'\//', '/', $path);
                 }
-                $path = preg_replace('/^'.$locale_regex.'\//', '/', $path);
-                $prefix = $locale == $meta['original'] ? $this->orig_path : '/'.$locale;
-
+                $folder_keys = array_keys($this->folders);
+                $prefix = '';
+                if(len($folder_keys) > 0) {
+                    $prefix = '/' + $this->folders[$locale];
+                    $locale_keys = $folder_keys;
+                }
+                else if($locale != $meta['original']){
+                    $prefix =  '/'.$locale;
+                    $locale_keys = $meta['localeKeys'];
+                }
+                $locale_regex = '('.implode('|', $locale_keys).')';
+                $path = preg_replace('/^\/?'.$locale_regex.'\//', '/', $path);
                 return $scheme.$host.$port.$this->subdir_base.$prefix.$path.$query.$fragment;
             case 'hash':
                 $fragment = '#locale_'.$locale;
@@ -449,7 +457,7 @@ class BablicSDK
                 $path = $parsed_url['path'];
                 preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
                 if ($matches) {
-                    return $matches[2];
+                    return $this->folders[$matches[2]) || $matches[2];
                 }
                 if ($from_cookie) {
                     return $default;
