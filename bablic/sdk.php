@@ -398,7 +398,7 @@ class BablicSDK
                 }
                 $folder_keys = array_keys($this->folders);
                 $prefix = '';
-                if(len($folder_keys) > 0) {
+                if(sizeof($folder_keys) > 0) {
                     $prefix = '/' . $this->getFolder($locale);
                     $locale_keys = $folder_keys;
                 }
