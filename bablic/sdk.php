@@ -285,7 +285,9 @@ class BablicSDK
         if (is_array($locale_keys)) {
             foreach ($locale_keys as $alt) {
                 if ($alt != $locale) {
-                    array_push($res, array($this->getLink($alt, $url), $alt));
+                    $parts = explode('_',$alt);
+                    $iso = sizeof($parts) > 1 ? $parts[0] .'-' . Tools::strtoupper($parts[1]) : $parts[0];
+                    array_push($res, array($this->getLink($alt, $url), $iso));
                 }
             }
             if ($locale != $meta['original']) {
