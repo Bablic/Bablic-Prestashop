@@ -21,8 +21,8 @@
   <script>
     var bablic = {};
     bablic.localeURL = 'subdir';
+    bablic.folders = {$folders_json}; 
     bablic.subDirBase = '{$subdir_base|escape:'htmlall':'UTF-8'}';
-    bablic.origPath = '{$orig_path|escape:'htmlall':'UTF-8'}';
 </script>
 {/if}
 <script data-cfasync="false"{if $async eq true} async{/if} src="{$snippet_url|escape:'htmlall':'UTF-8'}"></script>
