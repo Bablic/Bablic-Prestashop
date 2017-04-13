@@ -87,9 +87,26 @@ class BablicSDK
             $this->use_snippet_url = true;
         }
         if(!empty($options['folders'])) {
-            $this->folders = $options['folders'];
+            $this->folders[$folder] = $options['folders'];
         }
     }
+
+    private function getFolder($locale) {
+        foreach($this->folders as $folder => $l) {
+            if($l == $locale)
+                return $folder;
+        }
+        if(len($locale) == 2)
+            return '';
+        $locale = Tools::substr($locale, 0, 2);
+        foreach($this->folders as $folder => $l) {
+            if (Tools::substr($l, 0, 2) == $locale)
+                return $folder;
+        }
+        return '';
+    }
+
+
     private function saveDataToStore()
     {
         $this->store->set('meta', $this->meta);
@@ -371,7 +388,7 @@ class BablicSDK
                 $folder_keys = array_keys($this->folders);
                 $prefix = '';
                 if(len($folder_keys) > 0) {
-                    $prefix = '/' + $this->folders[$locale];
+                    $prefix = '/' . $this->getFolder($locale);
                     $locale_keys = $folder_keys;
                 }
                 else if($locale != $meta['original']){
@@ -457,11 +474,7 @@ class BablicSDK
                 $path = $parsed_url['path'];
                 preg_match('/^(?:'.preg_quote($this->subdir_base, '/').")?(\/(\w\w(_\w\w)?))(?:\/|$)/", $path, $matches);
                 if ($matches) {
-                    for($this->folders as $l => $folder){
-                        if($folder == $matches[2])
-                            return $l;
-                    }
-                    return $matches[2];
+                    return $this->folders[$matches[2]] || $matches[2];
                 }
                 if ($from_cookie) {
                     return $default;
