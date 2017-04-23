@@ -42,7 +42,6 @@ class BablicSDK
     private $pos = 0;
     private $timestamp = 0;
     private $use_snippet_url = false;
-    private $orig_path = '';
     private $folders = array();
     public function __construct($options)
     {
@@ -409,9 +408,11 @@ class BablicSDK
                 if (sizeof($folder_keys) > 0) {
                     $prefix = '/'.$this->getFolder($locale);
                     $locale_keys = $folder_keys;
-                } elseif ($locale != $meta['original']) {
-                    $prefix = '/'.$locale;
+                } else {
                     $locale_keys = $meta['localeKeys'];
+                    if ($locale != $meta['original']) {
+                        $prefix = '/'.$locale;
+                    }
                 }
                 $locale_regex = '('.implode('|', $locale_keys).')';
                 $path = preg_replace('/^\/?'.$locale_regex.'\//', '/', $path);
@@ -579,7 +580,7 @@ class BablicSDK
         if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return false;
         }
-        $is_bot = '/bot|crawler|baiduspider|facebookexternalhit|Twitterbot|80legs|mediapartners-google|adsbot-google/i';
+        $is_bot = '/bot|crawler|baiduspider|80legs|google|facebook|twitter|seo/i';
         if (preg_match($is_bot, $_SERVER['HTTP_USER_AGENT'], $matches)) {
             return true;
         }
