@@ -1,19 +1,17 @@
-* http://opensource.org/licenses/afl-3.0.php 
-* If you did not receive a copy of the license and are unable to 
-* obtain it through the world-wide-web, please send an email 
-* to license@prestashop.com so we can send you a copy immediately. 
-* 
-* DISCLAIMER 
-* 
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer 
-* versions in the future. If you wish to customize PrestaShop for your 
-* needs please refer to http://www.prestashop.com for more information. 
-* 
-*  @author    PrestaShop SA <contact@prestashop.com> 
-*  @copyright 2007-2017 PrestaShop SA 
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0) 
-*  International Registered Trademark & Property of PrestaShop SA 
-*} 
+{*
+ * Bablic Localization.
+ *
+ * LICENSE: This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @category  localization
+ *
+ * @author    Ishai Jaffe <ishai@bablic.com>
+ * @copyright Bablic 2017
+ * @license   http://www.gnu.org/licenses/ GNU License
+*}
  
 <div class='panel bablic_info'> 
   <img class='row' src="https://s.bablic.com/images/4/assets/logo-onwhite.png" alt="Bablic Website Translation"/> 
@@ -33,12 +31,8 @@
                         <div> 
                         <h4 class='subheader row'>That's how it works: </h4> 
                         <div> 
-                       <video loop="" muted="" autoplay="autoplay" style="height: 230px"> 
-                        <source src="https://s.bablic.com/images/5/gif.mp4" type="video/mp4"> 
-                        <source src="https://s.bablic.com/images/5/gif.ogv" type="video/ogg"> 
- 
-                    </video> 
-                        </div> 
+                            <iframe id="video" frameborder=0 width="410" height="230" style="width:410px;230px;" src="https://www.youtube.com/embed/6ZpomPQX1R8?iv_load_policy=3"></iframe>
+                        </div>
                         </div> 
                         <div><span></span> Reach new customers globally in a matter of minutes & increase sales</div> 
                         <div><span></span> Start ranking on leading search engines for your new languages with Bablic's SEO-friendly solution</div> 
@@ -47,7 +41,3 @@
                 </div> 
         </div> 
 </div> 
-~                                                                                                                                                                                                                                               
-~                                                                                                                                                                                                                                               
-~                                                                                                                                                                                                                                               
-~                                                 
