@@ -36,6 +36,7 @@ class BablicSDK
     public $access_token = '';
     private $channel_id = '';
     private $version = '';
+    private $snippet = '';
     private $meta = '';
     public $trial_started = false;
     private $_body = '';
@@ -219,6 +220,9 @@ class BablicSDK
         $url = "https://www.bablic.com/api/v1/site/$this->site_id?access_token=$this->access_token&channel_id=$this->channel_id";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         $result = Tools::jsonDecode($result, true);
