@@ -19,7 +19,7 @@
 {/foreach}
 {if $subdir eq true}
   <script>
-    var bablic = {};
+    var bablic = window.bablic||{};
     bablic.localeURL = 'subdir';
     bablic.folders = {$folders_json}; 
     bablic.subDirBase = '{$subdir_base|escape:'htmlall':'UTF-8'}';
